@@ -1,0 +1,8 @@
+#folders
+*\logs
+*\archive
+*\data
+*\__pycache__
+
+#file extensions
+*.vs
