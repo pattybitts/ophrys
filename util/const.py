@@ -1,6 +1,12 @@
 import math, pytz
 
 IMG_SAVE = "C:\\Users\\patbi\\OneDrive\\Documents\\2022\\ophrys\\image_files\\"
+OUT_PATH = "C:\\Users\\patbi\\OneDrive\\Git\\python_projects\\ophrys\\output\\"
+
+#librosa
+MUSIC_PATH = "C:\\Users\\patbi\\OneDrive\\Git\\python_projects\\ophrys\\input\\"
+SAMPLE_RATE = 10000
+HOP_LENGTH = 10
 
 GOLDEN = 1.618
 #note i needed 50/5000 for a full render
