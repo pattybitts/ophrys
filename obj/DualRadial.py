@@ -1,5 +1,7 @@
 import math
 
+import util.const as const
+
 from obj.PixelArray import PixelArray
 
 class DualRadial():
@@ -13,20 +15,33 @@ class DualRadial():
         self.c2y = c2y
         self.r2 = r2
 
+    def draw_canvas(self, profile):
+        theta = 0
+        while theta <= 2 * math.pi:
+            self.draw_line(theta, profile)
+            theta += const.DR_ST
+
     def draw_line(self, theta, profile):
         #don't forget rounding to our pixel resolution!
+        #this will definitely get more complex as we go
         x0 = self.c2x - self.r2 * math.sin(theta)
         y0 = self.c2y - self.r2 * math.cos(theta)
         x1 = self.c1x - self.r1 * math.sin(theta)
         y1 = self.c1y - self.r1 * math.cos(theta)
         m = (y1 - y0) / (x1 - x0)
         pl = len(profile)
-        dx = (x1 - x0) / pl / 10 #trying 10 for now, will vary with pixel density?
+        dx = (x1 - x0) / pl / const.DX_ST
         for p in profile:
-            for i in range(10):
-                x = int(x0 + dx)
-                y = int(y0 + m * dx)
-                r = int(100 * p[1] / 100)
-                g = int(100 * p[1] / 100)
-                u = int(100 * p[1] / 100) + int(150 * p[0] / 12)
+            for i in range(const.DX_ST):
+                x = int(x0 + dx * i)
+                y = int(y0 + m * dx * i)
+                if x > self.parr.x or x < 0 or y > self.parr.y or y < 0: continue
+                #color setting will need to be standardized and implemented through our color filter
+                #this is next, I think. before importing a sound profile
+                r = int(100 - 100 * p[1] / 100)
+                g = int(100 - 100 * p[1] / 100)
+                u = int(250 - (100 * p[1] / 100 + 150 * p[0] / const.TEST_PER))
+                #this paradigm will be useful to remember once I get into color filtering
                 self.parr.setp(x, y, r, g, u)
+            x0 = x0 + dx * const.DX_ST
+            y0 = y0 + m * dx * const.DX_ST

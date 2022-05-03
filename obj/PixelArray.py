@@ -1,5 +1,9 @@
 from PIL import Image
 
+import util.const as const
+import util.util as util
+import util.txt as txt
+
 from obj.Pixel import Pixel
 
 class PixelArray():
@@ -18,6 +22,11 @@ class PixelArray():
                 rgu = (px.r, px.g, px.u)
                 img.putpixel(xy, rgu)
         img.show()
+        img_str = const.IMG_SAVE + txt.date_file_str(util.now()) + ".png"
+        img.save(img_str)
 
     def setp(self, x, y, r, g, u):
-        self.arr[x][y] = Pixel(r, g, u)
+        try:
+            self.arr[x][y] = Pixel(r, g, u)
+        except:
+            return
