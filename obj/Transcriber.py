@@ -21,7 +21,7 @@ class Transcriber():
         y, sr = librosa.load(self.in_file, sr=1000)
         return len(y)/sr
 
-    def transcribe(self):
+    def transcribe_chromagram(self):
         offset = 0
         full_chromagram = []
         while offset < self.song_dur_s:
@@ -39,3 +39,28 @@ class Transcriber():
         filename = const.OUT_PATH + "chromagram_" + txt.date_file_str(util.now())
         print("Attempting to dump pickle at: " + filename)
         ds.dump_pickle(full_chromagram, filename)
+
+    def transcribe_spectogram(self):
+        offset = 0
+        full_spec = []
+        while offset < self.song_dur_s:
+            y, sr = librosa.load(self.in_file, offset=offset, duration=self.t_inc)
+            spec = librosa.feature.melspectrogram(y, sr=sr, n_mels=108, fmin=15.8846, fmax=8133.68)
+            for i in range(len(spec[0])):
+                point = []
+                for s in spec:
+                    point.append(s[i])
+                full_spec.append(point)
+            print("\nAdded: {cl} lines to full spectrogram. : {fl}".format(cl=len(spec[0]), fl=len(full_spec)))
+            print("Offset: " + str(offset))
+            offset += self.t_inc
+        filename = const.OUT_PATH + "melspec_" + txt.date_file_str(util.now())
+        print("Attempting to dump pickle at: " + filename)
+        ds.dump_pickle(spec, filename)
+        csv_str = ""
+        for f in full_spec:
+            csv_str += "\n"
+            for n in f:
+                csv_str += str(n) + ","
+            csv_str = csv_str.rstrip(",")
+        util.file(csv_str, const.OUT_PATH + "profile_csv_" + txt.date_file_str(util.now()) + ".csv")
