@@ -1,4 +1,4 @@
-import datetime
+import datetime, numpy as np
 
 import util.ret as ret
 
@@ -15,3 +15,18 @@ def file(variable, filename):
         return ret.SUCCESS
     except:
         return ret.ERROR
+
+def swap_axes(nparr):
+    nparr = np.rot90(nparr)
+    nparr = np.flip(nparr, 0)
+    return nparr
+
+def nparr_to_csv(arr):
+    arr = swap_axes(arr)
+    csv_str = ""
+    for a1 in arr:
+        for a2 in a1:
+            csv_str += str(a2) + ","
+        csv_str = csv_str.rstrip(",")
+        csv_str += "\n"
+    return csv_str
