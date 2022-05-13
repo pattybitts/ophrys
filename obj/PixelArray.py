@@ -13,6 +13,7 @@ class PixelArray():
         self.y = int(y)
         self.arr = [[Pixel(0, 0, 0) for i in range(self.y)] for j in range(self.x)]
 
+    #TODO separate show and save
     def show(self):
         img = Image.new(mode="RGB", size=(self.x, self.y))
         for x in range(self.x):

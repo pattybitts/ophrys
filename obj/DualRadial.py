@@ -1,6 +1,8 @@
 import math
+import numpy as np
 
 import util.const as const
+import util.util as util
 
 from obj.PixelArray import PixelArray
 
@@ -15,36 +17,38 @@ class DualRadial():
         self.c2y = c2y
         self.r2 = r2
 
-    def draw_canvas(self, profile):
+    #temporarily modding to only draw a quarter to take down testing time
+    def draw_canvas(self, stencil):
+        theta = const.D_START
+        while theta <= const.L_START:
+            self.draw_line(theta, stencil, loose=False)
+            theta += const.DDR
         theta = 0
-        while theta <= 2 * math.pi:
-            self.draw_line(theta, profile)
-            theta += const.DR_ST
+        while theta <= 2 * math.pi - (const.L_START - const.D_START):
+            self.draw_line(theta + const.L_START, stencil, loose=True)
+            theta += const.LDR
 
-    def draw_line(self, theta, profile):
+    def draw_line(self, theta, stencil, loose=True):
         #don't forget rounding to our pixel resolution!
         #this will definitely get more complex as we go
         x0 = self.c2x - self.r2 * math.sin(theta)
         y0 = self.c2y - self.r2 * math.cos(theta)
         x1 = self.c1x - self.r1 * math.sin(theta)
         y1 = self.c1y - self.r1 * math.cos(theta)
-        m = (y1 - y0) / (x1 - x0)
-        pl = len(profile)
-        dx = (x1 - x0) / pl / const.DX_ST
-        for p in reversed(profile):
-            for i in range(const.DX_ST):
-                x = int(x0 + dx * i)
-                y = int(y0 + m * dx * i)
-                if x > self.parr.x or x < 0 or y > self.parr.y or y < 0: continue
-                #color setting will need to be standardized and implemented through our color filter
-                #this is next, I think. before importing a sound profile
-                r = int(100)
-                g = int(100)
-                u = int(100 + 155 * p[0])
-                #this paradigm will be useful to remember once I get into color filtering
-                self.parr.setp(x, y, r, g, u)
-            x0 = x0 + dx * const.DX_ST
-            y0 = y0 + m * dx * const.DX_ST
-
-    def color_filter(self, point):
-        pass
+        line_x_len = (x1 - x0)
+        if line_x_len == 0: return
+        m = (y1 - y0) / line_x_len
+        line_points = const.LLP if loose else const.DLP
+        dx = line_x_len / line_points
+        x = x0; xp = x0; xpp = None
+        y = y0; yp = y0; ypp = None
+        for i in range(line_points):
+            s = stencil[int(round(i / line_points * len(stencil), 0))]
+            xp = int(round(x, 0))
+            yp = int(round(y, 0))
+            if xp != xpp or yp != ypp:
+                if xp <= self.parr.x and xp >= 0 \
+                    and yp <= self.parr.y and yp >= 0: self.parr.setp(xp, yp, s[0], s[1], s[2])
+            xpp = xp; ypp = yp
+            x += dx
+            y += dx * m
