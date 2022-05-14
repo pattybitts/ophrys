@@ -8,14 +8,21 @@ from obj.PixelArray import PixelArray
 
 class DualRadial():
 
-    def __init__(self, parr, c1x, c1y, r1, c2x, c2y, r2):
+    def __init__(self, parr, c1x, c1y, r1, c2x, c2y, r2, theta_offset):
         self.parr = parr
         self.c1x = c1x
         self.c1y = c1y
         self.r1 = r1
         self.c2x = c2x
         self.c2y = c2y
+        '''
+        self.c2x1 = c2x1
+        self.c2y1 = c2y1
+        self.c2x2 = c2x2
+        self.c2y2 = c2y2
+        '''
         self.r2 = r2
+        self.theta_offset = theta_offset
 
     #temporarily modding to only draw a quarter to take down testing time
     def draw_canvas(self, stencil):
@@ -31,8 +38,8 @@ class DualRadial():
     def draw_line(self, theta, stencil, loose=True):
         #don't forget rounding to our pixel resolution!
         #this will definitely get more complex as we go
-        x0 = self.c2x - self.r2 * math.sin(theta)
-        y0 = self.c2y - self.r2 * math.cos(theta)
+        x0 = self.c2x - self.r2 * math.sin(theta + self.theta_offset)
+        y0 = self.c2y - self.r2 * math.cos(theta + self.theta_offset)
         x1 = self.c1x - self.r1 * math.sin(theta)
         y1 = self.c1y - self.r1 * math.cos(theta)
         line_x_len = (x1 - x0)
@@ -42,7 +49,7 @@ class DualRadial():
         dx = line_x_len / line_points
         x = x0; xp = x0; xpp = None
         y = y0; yp = y0; ypp = None
-        for i in range(line_points):
+        for i in reversed(range(line_points)):
             s = stencil[int(round(i / line_points * len(stencil), 0))]
             xp = int(round(x, 0))
             yp = int(round(y, 0))

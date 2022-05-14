@@ -1,3 +1,5 @@
+import math
+
 import util.const as const
 import util.ds as ds
 import util.ret as ret
@@ -28,7 +30,7 @@ if not ret.success(stencil):
 
 #fyi height is 1000, width is 1618
 parr = PixelArray(1000 * const.GOLDEN, 1000)
-dr = DualRadial(parr, 800, 500, 400, 700, 400, 150)
+dr = DualRadial(parr, 600, 500, 1100, 550, 200, 120, -1 * math.pi * .33)
 start_time = util.now()
 print("Starting canvas generation at: " + str(util.now()))
 dr.draw_canvas(stencil.stencil)
