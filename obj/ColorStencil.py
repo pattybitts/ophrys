@@ -15,7 +15,6 @@ class ColorStencil():
         self.set_chroma_sums(profile)
         self.stencil = self.create_stencil(profile)
 
-
     def create_point(self, point, chroma_sum):
         com_num = 0
         for idx, c in np.ndenumerate(point):
