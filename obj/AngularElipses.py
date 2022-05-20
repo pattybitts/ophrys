@@ -9,29 +9,31 @@ from obj.PixelArray import PixelArray
 
 class AngularElipses():
 
-    def __init__(self, parr, x0, y0, x1, y1, k_shift):
+    def __init__(self, parr, x0, y0, x1, y1, k_shift, t_min=.1):
         self.parr = parr
         self.x0 = x0
         self.y0 = y0
         self.x1 = x1
         self.y1 = y1
-        self.k = calc.distance(x0, y0, x1, y1) + k_shift
+        self.k_shift = k_shift
+        self.t_min = t_min
 
     def draw_elipse(self, x1, y1, r, g, u):
         xc = (self.x0 + x1) / 2
         yc = (self.y0 + y1) / 2
+        k = calc.distance(self.x0, self.y0, x1, y1) + self.k_shift
         for i in range(2):
             theta = 0
             direction = 1 if i == 0 else -1
             while theta < math.pi:
                 m = math.tan(theta)
-                dt = self.k / const.ELP * direction
+                dt = k / const.ELP * direction
                 x = xc; xp = xc; xpp = None
                 y = yc; yp = yc; ypp = None
                 for j in range(const.ELP):
                     d0 = calc.distance(self.x0, self.y0, x, y)
                     d1 = calc.distance(x1, y1, x, y)
-                    if d0 + d1 >= self.k:
+                    if d0 + d1 >= k:
                         xp = int(round(x, 0))
                         yp = int(round(y, 0))
                         if xp != xpp or yp != ypp:
@@ -51,14 +53,14 @@ class AngularElipses():
     #under this design paradigm all the 'artistic' tuning will occur here
     #we scale t to 1 so that we can normalize these equations to the canvas
     def par_x(self, t):
-        return (self.x1 - self.x0) * t + self.x0
+        return (self.x1 - self.x0) * (self.t_min ** 2 + ((1 - self.t_min) * t) ** 2) + self.x0
 
     def par_y(self, t):
-        return (self.y1 - self.y0) * t ** 2 + self.y0
+        return (self.y1 - self.y0) * (self.t_min + (1 - self.t_min) * t) + self.y0
 
     def theta_offset(self, x, y, theta):
-        r = calc.distance(self.x0, self.y1, x, y)
-        if theta > 0:
+        r = calc.distance(self.x0, self.y0, x, y)
+        if theta < 0:
             theta2 = math.atan((x - self.x0)/(y - self.y0)) - abs(theta)
             dx = r * math.sin(theta2)
             dy = r * math.cos(theta2)
@@ -68,17 +70,18 @@ class AngularElipses():
             dy = r * math.sin(theta2)
         return self.x0 + dx, self.y0 + dy
 
+    #testing rn to understand boundary conditions
     def draw_canvas(self, stencil):
+        elipses = len(stencil.stencil)
         frames = len(stencil.chroma_sums)
-        print("Elipses to draw: " + str(len(stencil.stencil)))
+        print("Elipses to draw: " + str(elipses))
         frame_t = 1 / frames
-        i = 0
         for s in stencil.stencil:
+        #for i in range(elipses-1, elipses):
+        #    s = stencil.stencil[i]
             t = (frames - s[0]) * frame_t
             x = self.par_x(t)
             y = self.par_y(t)
             xt, yt = self.theta_offset(x, y, s[1])
             #self.draw_elipse(xt, yt, 255, 255, 255)
             self.draw_elipse(xt, yt, s[2], s[3], s[4])
-            #i += 1
-            #if i > 1000: break

@@ -18,8 +18,8 @@ LDR = 2 * math.pi / 6000
 
 #elipse drawing constants
 #1000/1000 gives a decent profile in ~6s
-ELP = 50
-EDR = math.pi / 50
+ELP = 500
+EDR = math.pi / 1000
 
 #for rgu color scaling
 R_RANGE = [0, .5]
