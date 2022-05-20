@@ -10,12 +10,12 @@ class RGUElipseStencil:
     def __init__(self, profile, threshold, theta_window):
         profile = util.swap_axes(profile)
         profile = self.prune_profile(profile, threshold)
+        self.theta_window = theta_window
         self.chroma_sums = []
         self.chroma_max = 0
         self.set_chroma_sums(profile)
         self.stencil = []
         self.fill_stencil(profile)
-        self.theta_window = theta_window
 
     def prune_profile(self, profile, threshold):
         pruned_profile = []
@@ -41,16 +41,16 @@ class RGUElipseStencil:
         for i in range(len(self.chroma_sums)):
             self.add_frame(profile[i], self.chroma_sums[i], i)
         
-    #leaving off here. I think we need to iterate with index, then do a 
-    #(relatively simple) translation of index offset to theta_window/2
     def add_frame(self, point, chroma_sum, index):
         rgu = self.point_rgu(point, chroma_sum)
-        for p in point:
-            if p > 0: self.stencil.append(rgu + [index])
+        for idx, p in np.ndenumerate(point):
+            if p > 0:
+                theta = self.theta_offset(idx[0])
+                self.stencil.append([index] + [theta] + rgu)
 
-    def theta_offset(self, point):
-        for idx, c in np.ndenumerate(point):
-            pass
+    def theta_offset(self, idx):
+        idx_offset = (idx + 4) % 12
+        return (idx_offset - 6) / 12 * self.theta_window
 
     def point_rgu(self, point, chroma_sum):
         com_num = 0

@@ -21,7 +21,7 @@ new_stencil = True
 stencil_file = "{p}stencil_soul".format(p=const.OUT_PATH)
 if new_stencil:
     print("Starting stencil generation at: " + str(util.now()))
-    stencil = RGUElipseStencil(profile, .3, math.pi / 2)
+    stencil = RGUElipseStencil(profile, .4, math.pi)
     ds.dump_pickle(stencil, stencil_file)
 else:
     stencil = ds.load_pickle(stencil_file)
@@ -34,9 +34,9 @@ parr = PixelArray(1000 * const.GOLDEN, 1000)
 
 x0 = 500
 y0 = 200
-x1 = 1500
-y1 = 900
-k_shift = 15
+x1 = 1600
+y1 = 1000
+k_shift = 20
 ae = AngularElipses(parr, x0, y0, x1, y1, k_shift)
 print("Starting canvas generation at: " + str(util.now()))
 ae.draw_canvas(stencil)
