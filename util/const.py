@@ -40,3 +40,17 @@ for i in range(100):
     pitch = i%TEST_PER
     amp = i
     TEST_SET.append([pitch, amp])
+
+#imported time constants
+TZ = pytz.UTC
+LTZ = pytz.timezone('US/Eastern')
+LTZ_OFFSET = -5
+
+#datetime formatting
+MONTHS = {"Jan": 1, "Feb": 2, "Mar": 3, "Apr": 4, "May": 5, "Jun": 6, \
+    "Jul": 7, "Aug": 8, "Sep": 9, "Dec": 10, "Nov": 11, "Dec": 12}
+SHORT_DATE = "%y_%m_%d"
+DATE_FORMAT = "%d-%b-%y %H:%M:%S"
+TIME_FORMAT = "%H:%M:%S"
+DATE_FILE_FORMAT = "%y_%m_%d_%H%M_%S"
+TD_DATE_FORMAT = "%Y-%m-%d"

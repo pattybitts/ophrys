@@ -26,7 +26,7 @@ def nparr_to_csv(arr):
     csv_str = ""
     for a1 in arr:
         for a2 in a1:
-            csv_str += str(a2) + ","
+            csv_str += "{a:>7.3f},".format(a=a2)
         csv_str = csv_str.rstrip(",")
         csv_str += "\n"
     return csv_str
