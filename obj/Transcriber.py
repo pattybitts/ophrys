@@ -39,10 +39,10 @@ class Transcriber():
 
     def transcribe_stft(self):
         offset = 0
-        full_spec = np.ndarray((1025, 0))
+        full_spec = np.ndarray((4097, 0))
         while offset < self.song_dur_s:
             y, sr = librosa.load(self.in_file, offset=offset, duration=self.t_inc)
-            spec = np.abs(librosa.stft(y))
+            spec = np.abs(librosa.stft(y, n_fft=8192))
             full_spec = np.concatenate((full_spec, spec), 1)
             print("\nAdded: {cl} lines to full spectrogram.".format(cl=len(spec[0])))
             print("Offset: " + str(offset))
@@ -53,10 +53,10 @@ class Transcriber():
 
     def transcribe_spectogram(self):
         offset = 0
-        full_spec = np.ndarray((108, 0))
+        full_spec = np.ndarray((1000, 0))
         while offset < self.song_dur_s:
             y, sr = librosa.load(self.in_file, offset=offset, duration=self.t_inc)
-            spec = librosa.feature.melspectrogram(y, sr=sr, n_mels=108, fmin=15.8846, fmax=8133.68)
+            spec = librosa.feature.melspectrogram(y, sr=sr, n_mels=1000)
             full_spec = np.concatenate((full_spec, spec), 1)
             print("\nAdded: {cl} lines to full spectrogram.".format(cl=len(spec[0])))
             print("Offset: " + str(offset))

@@ -13,11 +13,13 @@ from obj.SpecStencil import SpecStencil
 from obj.TestDisplay import TestDisplay
 
 start_time = util.now()
-print("Intializing at : " + txt.time_str(util.now()))
-profile = ds.load_pickle("output\profile_spec_test_a4_a5_22_05_23_0908_15")
+print("Intializing at: " + txt.time_str(util.now()))
+#profile = ds.load_pickle("output\profile_spec_test_a4_a5_22_05_26_2013_55")
+profile = ds.load_pickle("output\profile_spec_epiphany_22_05_26_2051_53")
 if not ret.success(profile):
     print("Invalid profile")
     quit()
+profile = profile[0:800,:]
 
 new_stencil = False
 
@@ -33,10 +35,13 @@ if not ret.success(stencil):
     quit()
 
 x, y  = profile.shape
-parr = PixelArray(x, y)
+parr = PixelArray(y, x)
 td = TestDisplay(parr, np.amin(profile), np.amax(profile))
 print("Starting canvas generation at: " + txt.time_str(util.now()))
 td.draw_array(profile)
+#td.heat_overlay(profile)
+td.peak_overlay(profile)
+td.octave_overlay(profile)
 print("Canvas generated at: " + txt.time_str(util.now()) + ", now drawing ...")
 parr.show()
 
