@@ -1,17 +1,49 @@
 import numpy as np, copy
 
 import util.util as util
+import util.calc as calc
+import util.const as const
 
 class SpecStencil:
 
     def __init__(self, profile):
         self.profile = profile
-        self.amin = np.amin(self.profile)
-        amax  = np.amax(self.profile)
-        self.active_val_th = self.amin + .1 * abs(self.amin)
-        self.active_slope_th = (amax - self.amin) / 3
-        self.bin_width = 10.76
-        self.stencil = self.generate_note_list()
+        self.stencil = self.generate_note_profile()
+
+    def generate_note_profile(self):
+        #generating note bins
+        note_ref = 27.5
+        note_bins = []
+        for i in range(0, 8):
+            for j in range(0, 12):
+                note_bins.append(note_ref)
+                note_ref *= 2 ** (1/12)
+        #creating stencil
+        profile = util.swap_axes(self.profile)
+        stencil = []
+        for frame in profile:
+            #separating spec values into appropriate bins
+            notes = []
+            for n in note_bins:
+                note = []
+                l = n * .5 ** (1/24)
+                h = n * 2 ** (1/24)
+                for i in range(len(frame)):
+                    hz = calc.freq(i)
+                    if hz < l:
+                        continue
+                    elif hz >= l and hz <= h:
+                        note.append(frame[i])
+                    elif hz > h:
+                        break
+                if not note: continue
+                #calculating bin characteristics
+                amp = np.sum(note) / len(note)
+                com = calc.com(note, start=l, inc=const.FREQ_INC)
+                spike = calc.spike_score(note)
+                notes.append({'amp': amp, 'com': com, 'spike': spike})
+            stencil.append(copy.copy(notes))
+        return stencil
 
     def generate_note_list(self):
         profile = util.swap_axes(self.profile)

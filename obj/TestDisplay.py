@@ -5,6 +5,7 @@ import copy
 import util.calc as calc
 import util.const as const
 import util.util as util
+import util.ds as ds
 
 from obj.PixelArray import PixelArray
 
@@ -72,6 +73,30 @@ class TestDisplay():
                 if a - hz > -2.7 and a - hz < 0:
                     self.parr.setp(idx[0], idx[1], 255, 255, 0)
                     break
+
+    def note_overlay(self, nparr):
+        nparr = util.swap_axes(nparr)
+        note_bins = ds.load_pickle("input\\note_bins")
+        for idx, val in np.ndenumerate(nparr):
+            hz = calc.freq(idx[1])
+            for n in note_bins:
+                if n - hz > -2.7 and n - hz < 0:
+                    self.parr.setp(idx[0], idx[1], 0, 255, 255)
+                    break
+
+    def com_overlay(self, nparr, stencil):
+        nparr = util.swap_axes(nparr)
+        for i in range(len(stencil)):
+            s = stencil[i]
+            for n in s:
+                #if n['spike'] < .33: continue
+                val = (n['amp'] + (self.max - self.min)) / (self.max - self.min)
+                if val < .5: continue
+                int_val  = int(round(val * 255))
+                y = int(round((n['com'] - const.FREQ_INC / 2) / const.FREQ_INC))
+                self.parr.setp(i, y, 0, 255 - int_val, int_val)
+                if i < 100 and n['com'] > 200 and n['com'] < 240:
+                    print("x: {i} y: {y} com: {c:>.2f} amp: {a:>.2f} spike: {s:>.3f}".format(i=i, y=y, c=n['com'], a=n['amp'], s=n['spike']))
     
     '''
     def __init__(self, profile):

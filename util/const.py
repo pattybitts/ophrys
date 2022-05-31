@@ -26,6 +26,9 @@ R_RANGE = [0, .5]
 G_RANGE = [0, .7]
 U_RANGE = [0, 1]
 
+#Spectrogram interpretation
+FREQ_INC = 22050 / 8192
+
 #time values, formatting
 TZ = pytz.UTC
 LTZ = pytz.timezone('US/Eastern')
