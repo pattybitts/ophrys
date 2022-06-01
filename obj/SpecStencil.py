@@ -12,14 +12,15 @@ class SpecStencil:
 
     def generate_note_profile(self):
         #generating note bins
-        note_ref = 27.5
+        note_ref = 110
         note_bins = []
-        for i in range(0, 8):
+        for i in range(0, 6):
             for j in range(0, 12):
                 note_bins.append(note_ref)
                 note_ref *= 2 ** (1/12)
         #creating stencil
         profile = util.swap_axes(self.profile)
+        amin = np.amin(profile)
         stencil = []
         for frame in profile:
             #separating spec values into appropriate bins
@@ -33,13 +34,13 @@ class SpecStencil:
                     if hz < l:
                         continue
                     elif hz >= l and hz <= h:
-                        note.append(frame[i])
+                        note.append([hz, frame[i] - amin])
                     elif hz > h:
                         break
                 if not note: continue
                 #calculating bin characteristics
-                amp = np.sum(note) / len(note)
-                com = calc.com(note, start=l, inc=const.FREQ_INC)
+                amp = calc.bin_mass(note, average=True)
+                com = calc.bin_com(note)
                 spike = calc.spike_score(note)
                 notes.append({'amp': amp, 'com': com, 'spike': spike})
             stencil.append(copy.copy(notes))

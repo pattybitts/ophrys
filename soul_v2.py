@@ -21,7 +21,7 @@ if not ret.success(profile):
     quit()
 profile = profile[0:800,:]
 
-new_stencil = False
+new_stencil = True
 
 stencil_file = "{p}spec_stencil_test".format(p=const.OUT_PATH)
 if new_stencil:

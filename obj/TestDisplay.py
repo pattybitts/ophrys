@@ -66,7 +66,7 @@ class TestDisplay():
 
     def octave_overlay(self, nparr):
         nparr = util.swap_axes(nparr)
-        a_notes = [27.5, 55, 110, 220, 440, 880, 1760, 3520]
+        a_notes = [110, 220, 440, 880, 1760, 3520]
         for idx, val in np.ndenumerate(nparr):
             hz = calc.freq(idx[1])
             for a in a_notes:
@@ -80,7 +80,7 @@ class TestDisplay():
         for idx, val in np.ndenumerate(nparr):
             hz = calc.freq(idx[1])
             for n in note_bins:
-                if n - hz > -2.7 and n - hz < 0:
+                if n - hz > -1.35 and n - hz < 1.35:
                     self.parr.setp(idx[0], idx[1], 0, 255, 255)
                     break
 
@@ -88,15 +88,12 @@ class TestDisplay():
         nparr = util.swap_axes(nparr)
         for i in range(len(stencil)):
             s = stencil[i]
-            for n in s:
-                #if n['spike'] < .33: continue
-                val = (n['amp'] + (self.max - self.min)) / (self.max - self.min)
-                if val < .5: continue
-                int_val  = int(round(val * 255))
+            for n in s: 
+                val = n['amp'] / (self.max - self.min)
+                if val < .75: continue
+                int_val = int(round(val * 255))
                 y = int(round((n['com'] - const.FREQ_INC / 2) / const.FREQ_INC))
                 self.parr.setp(i, y, 0, 255 - int_val, int_val)
-                if i < 100 and n['com'] > 200 and n['com'] < 240:
-                    print("x: {i} y: {y} com: {c:>.2f} amp: {a:>.2f} spike: {s:>.3f}".format(i=i, y=y, c=n['com'], a=n['amp'], s=n['spike']))
     
     '''
     def __init__(self, profile):

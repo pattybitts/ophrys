@@ -9,23 +9,33 @@ def freq(n):
     unit = const.FREQ_INC
     return n * unit + unit / 2
 
+#at this point these functions really aren't fit for a universal calc module
+#let's find a home for them
+
+def bin_mass(points, average=False):
+    mass = 0
+    for p in points:
+        mass += p[1]
+    if average: return mass / len(points)
+    return mass
+
 #i should figure out how i want to structure returns on this
-def com(list, start=0.0, inc=1.0):
+#adjusting this to take a list of tuples in the form of (x, m)
+def bin_com(points):
     numerator = 0
-    denominator = np.sum(list)
+    denominator = 0
+    for p in points:
+        numerator += p[0] * p[1]
+        denominator += p[1]
     if denominator == 0: return 0
-    for idx, l in np.ndenumerate(list):
-        numerator += l * (start + idx[0] * inc)
     return numerator / denominator
 
-#homemade, measure of sharpeness by finding percentage of mass
-def spike_score(list, window=.2):
-    mass = np.sum(list)
+def spike_score(points, pct_radius=.2):
+    mass = bin_mass(points)
     if mass == 0: return 0
-    center = com(list)
+    center = bin_com(points)
+    width = points[-1][0] - points[0][0]
     spike = 0
-    width = len(list) - 1
-    for idx, x in np.ndenumerate(list):
-        if idx[0] >= center - width * window * .5 and idx[0] <= center + width * window * .5:
-            spike += x
+    for p in points:
+        if p[0] >= center - pct_radius * width and p[0] <= center + pct_radius * width: spike += p[1]
     return spike / mass
