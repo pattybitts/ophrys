@@ -89,11 +89,12 @@ class TestDisplay():
         for i in range(len(stencil)):
             s = stencil[i]
             for n in s: 
-                val = n['amp'] / (self.max - self.min)
-                if val < .75: continue
-                int_val = int(round(val * 255))
+                amp_val = n['amp'] / (self.max - self.min)
+                peak_val = n['peak'] / (self.max - self.min)
                 y = int(round((n['com'] - const.FREQ_INC / 2) / const.FREQ_INC))
-                self.parr.setp(i, y, 0, 255 - int_val, int_val)
+                if amp_val > .3: self.parr.setp(i, y, 255, 0, 0)
+                if peak_val > .7: self.parr.setp(i, y, 0, 255, 0)
+                if n['spike'] < 10: self.parr.setp(i, y, 0, 0, 255)
     
     '''
     def __init__(self, profile):

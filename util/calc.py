@@ -12,11 +12,16 @@ def freq(n):
 #at this point these functions really aren't fit for a universal calc module
 #let's find a home for them
 
-def bin_mass(points, average=False):
+def bin_peak(points):
+    max = 0
+    for p in points:
+        if p[1] > max: max = p[1]
+    return max
+
+def bin_mass(points):
     mass = 0
     for p in points:
         mass += p[1]
-    if average: return mass / len(points)
     return mass
 
 #i should figure out how i want to structure returns on this
@@ -30,12 +35,18 @@ def bin_com(points):
     if denominator == 0: return 0
     return numerator / denominator
 
-def spike_score(points, pct_radius=.2):
-    mass = bin_mass(points)
+#returns the width in hz at which the mass of the spike reaches the given percentage of the bin's mass
+def spike_score(points, mass, center, mass_th=.5):
     if mass == 0: return 0
-    center = bin_com(points)
-    width = points[-1][0] - points[0][0]
-    spike = 0
+    center_idx = 0
     for p in points:
-        if p[0] >= center - pct_radius * width and p[0] <= center + pct_radius * width: spike += p[1]
-    return spike / mass
+        if abs(p[0] - center) <= const.FREQ_INC / 2: center_idx = points.index(p)
+    spike_mass = points[center_idx][1]
+    r = 1
+    while spike_mass / mass < mass_th:
+        rl = center_idx - r
+        rh = center_idx + r
+        if rl >= 0: spike_mass += points[rl][1]
+        if rh < len(points): spike_mass += points[rh][1]
+        r += 1
+    return mass_th * r * 2 * const.FREQ_INC / (spike_mass / mass)

@@ -39,10 +39,12 @@ class SpecStencil:
                         break
                 if not note: continue
                 #calculating bin characteristics
-                amp = calc.bin_mass(note, average=True)
+                amp  = calc.bin_mass(note)
+                ampa = amp / len(note)
                 com = calc.bin_com(note)
-                spike = calc.spike_score(note)
-                notes.append({'amp': amp, 'com': com, 'spike': spike})
+                spike = calc.spike_score(note, amp, com)
+                peak  = calc.bin_peak(note)
+                notes.append({'amp': ampa, 'com': com, 'spike': spike, 'peak': peak})
             stencil.append(copy.copy(notes))
         return stencil
 
