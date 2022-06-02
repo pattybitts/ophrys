@@ -11,6 +11,7 @@ from obj.AngularElipses import AngularElipses
 from obj.RGUElipseStencil import RGUElipseStencil
 from obj.SpecStencil import SpecStencil
 from obj.TestDisplay import TestDisplay
+from obj.RadialParElipses import RadialParElipses
 
 start_time = util.now()
 print("Intializing at: " + txt.time_str(util.now()))
@@ -21,7 +22,7 @@ if not ret.success(profile):
     quit()
 profile = profile[0:800,:]
 
-new_stencil = True
+new_stencil = False
 
 stencil_file = "{p}spec_stencil_test".format(p=const.OUT_PATH)
 if new_stencil:
@@ -34,47 +35,35 @@ if not ret.success(stencil):
     print("Invalid stencil")
     quit()
 
-x, y  = profile.shape
-parr = PixelArray(y, x)
-td = TestDisplay(parr, np.amin(profile), np.amax(profile))
-print("Starting canvas generation at: " + txt.time_str(util.now()))
-td.draw_array(profile)
-#td.heat_overlay(profile)
-#td.peak_overlay(profile)
-td.octave_overlay(profile)
-#td.note_overlay(profile)
-td.com_overlay(profile, stencil.stencil)
-print("Canvas generated at: " + txt.time_str(util.now()) + ", now drawing ...")
-parr.show()
+if 0:
+    x, y  = profile.shape
+    parr = PixelArray(y, x)
+    td = TestDisplay(parr, np.amin(profile), np.amax(profile))
+    print("Starting canvas generation at: " + txt.time_str(util.now()))
+    td.draw_array(profile)
+    #td.heat_overlay(profile)
+    #td.peak_overlay(profile)
+    td.octave_overlay(profile)
+    #td.note_overlay(profile)
+    td.com_overlay(profile, stencil.stencil)
+    print("Canvas generated at: " + txt.time_str(util.now()) + ", now drawing ...")
+    parr.show()
+
+if 1:
+    parr = PixelArray(1000 * const.GOLDEN, 1000)
+    x0 = 500
+    y0 = 200
+    r0 = 20
+    r1 = 1100
+    theta0 = 4 / 6 * math.pi
+    theta1 = 1 / 12 * math.pi
+    thetar = 2 / 3 * math.pi
+    k_shift = 20
+    rpe = RadialParElipses(parr, x0, y0, r0, r1, theta0, theta1, thetar, k_shift)
+    print("Starting canvas generation at: " + txt.time_str(util.now()))
+    rpe.draw_guidelines()
+    print("Canvas generated at: " + txt.time_str(util.now()) + ", now drawing ...")
+    parr.show()
 
 render_time = util.now() - start_time
 print("Total render time: " + txt.delta_str(render_time))
-
-'''
-stencil_file = "{p}stencil_soul".format(p=const.OUT_PATH)
-if new_stencil:
-    print("Starting stencil generation at: " + str(util.now()))
-    stencil = RGUElipseStencil(profile, .5, math.pi)
-    ds.dump_pickle(stencil, stencil_file)
-else:
-    stencil = ds.load_pickle(stencil_file)
-if not ret.success(stencil):
-    print("Invalid stencil")
-    quit()
-
-#fyi height is 1000, width is 1618
-parr = PixelArray(1000 * const.GOLDEN, 1000)
-
-x0 = 500
-y0 = 200
-x1 = 1600
-y1 = 1000
-k_shift = 20
-ae = AngularElipses(parr, x0, y0, x1, y1, k_shift, .05)
-print("Starting canvas generation at: " + str(util.now()))
-ae.draw_canvas(stencil)
-print("Canvas generated at: " + str(util.now()) + ", now drawing ...")
-parr.show()
-render_time = util.now() - start_time
-print("Total render time: {r:.1f}".format(r=render_time.total_seconds()))
-'''
