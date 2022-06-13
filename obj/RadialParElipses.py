@@ -54,7 +54,8 @@ class RadialParElipses():
 
     def par_xy(self, t):
         r = self.r0 + (self.r1 - self.r0) * t ** 2
-        theta = self.theta0 + (self.theta1 - self.theta0) * t ** 3
+        #theta = self.theta0 + (self.theta1 - self.theta0) * t ** 3
+        theta = math.pi * 2
         x = self.x0 + r * math.cos(theta)
         y = self.y0 + r * math.sin(theta)
         return x, y
@@ -64,35 +65,63 @@ class RadialParElipses():
         r = calc.distance(self.x0, self.y0, x, y)
         lx = x - self.x0; ly = y - self.y0
         if ly == 0: return x, y
-        theta2 =  math.atan(lx/ly) + theta
+        theta2 = math.atan(lx/ly) + theta
         dx = r * math.sin(theta2)
         dy = r * math.cos(theta2)
         return self.x0 + dx, self.y0 + dy
 
     def draw_guidelines(self):
-        frame_t = 1 / 1000
-        for i in range(1000):
+        frame_t = 1 / 3000
+        for i in range(3000):
             x, y = self.par_xy(i * frame_t)
             xp = int(round(x, 0)); yp = int(round(y, 0))
             if xp <= self.parr.x and xp >= 0 and yp <= self.parr.y and yp >= 0: self.parr.setp(xp, yp, 255, 0, 0)
 
-            xm, ym = self.theta_offset(x, y, -1 * self.thetar)
-            xp = int(round(xm, 0)); yp = int(round(ym, 0))
-            if xp <= self.parr.x and xp >= 0 and yp <= self.parr.y and yp >= 0: self.parr.setp(xp, yp, 0, 255, 0)
-
-            xm, ym = self.theta_offset(x, y, -.5 * self.thetar)
+            xm, ym = self.theta_offset(x, y, .25 * self.thetar)
             xp = int(round(xm, 0)); yp = int(round(ym, 0))
             if xp <= self.parr.x and xp >= 0 and yp <= self.parr.y and yp >= 0: self.parr.setp(xp, yp, 255, 255, 0)
 
-            xm, ym = self.theta_offset(x, y, 1 * self.thetar)
-            xp = int(round(xm, 0)); yp = int(round(ym, 0))
-            if xp <= self.parr.x and xp >= 0 and yp <= self.parr.y and yp >= 0: self.parr.setp(xp, yp, 0, 0, 255)
-
             xm, ym = self.theta_offset(x, y, .5 * self.thetar)
             xp = int(round(xm, 0)); yp = int(round(ym, 0))
-            if xp <= self.parr.x and xp >= 0 and yp <= self.parr.y and yp >= 0: self.parr.setp(xp, yp, 255, 0, 255)                      
+            if xp <= self.parr.x and xp >= 0 and yp <= self.parr.y and yp >= 0: self.parr.setp(xp, yp, 0, 255, 0)
 
-        #testing rn to understand boundary conditions
+            xm, ym = self.theta_offset(x, y, .75 * self.thetar)
+            xp = int(round(xm, 0)); yp = int(round(ym, 0))
+            if xp <= self.parr.x and xp >= 0 and yp <= self.parr.y and yp >= 0: self.parr.setp(xp, yp, 0, 255, 255)
+
+            xm, ym = self.theta_offset(x, y, 1 * self.thetar)
+            xp = int(round(xm, 0)); yp = int(round(ym, 0))
+            if xp <= self.parr.x and xp >= 0 and yp <= self.parr.y and yp >= 0: self.parr.setp(xp, yp, 0, 0, 255)                      
+
+    '''
+    stencil data:
+    amp: sum of bin amplitudes above a cutoff threshold (20 rn) (this may vary far too widely to be practical?)
+    com: center of mass in Hz of note
+    peak: highest bin amplitude (0-80 dB)
+    spike: width in Hz, centered around CoM at which a threshold (50% rn) of bin mass is reached
+    '''
+
+    def draw_canvas(self, stencil):
+        frames = len(stencil)
+        frame_t = 1 / frames
+        for i in range(frames):
+            s = stencil[i]
+            t = i * frame_t
+            x, y = self.par_xy(t)
+            theta = self.note_theta(s['com'])
+            xt, yt = self.theta_offset(x, y, theta)
+    
+    #rn center is middle c (c4~=261) on an a4=440 tuning
+    #kind of a lazy intermediate fix, we're setting an arbitrary number of steps at which theta_offset will equal theta_r
+    #then we'll tune that to taste
+    #permanent solution would be to analyze
+    def note_theta(self, com):
+        base_note = 55
+        center_note = 220 * 2 ^ (3/12)
+        steps = calc.note_steps(base_note, com)
+
+    
+    #testing rn to understand boundary conditions
     def draw_canvas(self, stencil):
         elipses = len(stencil.stencil)
         frames = len(stencil.chroma_sums)

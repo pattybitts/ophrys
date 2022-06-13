@@ -18,9 +18,10 @@ def bin_peak(points):
         if p[1] > max: max = p[1]
     return max
 
-def bin_mass(points):
+def bin_mass(points, threshold=None):
     mass = 0
     for p in points:
+        if threshold and p[1] < threshold: continue
         mass += p[1]
     return mass
 
@@ -50,3 +51,6 @@ def spike_score(points, mass, center, mass_th=.5):
         if rh < len(points): spike_mass += points[rh][1]
         r += 1
     return mass_th * r * 2 * const.FREQ_INC / (spike_mass / mass)
+
+def note_steps(f0, f1):
+    return 12 * math.log(f1 / f0) / math.log(2)

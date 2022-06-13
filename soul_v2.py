@@ -55,11 +55,11 @@ if 1:
     y0 = 200
     r0 = 20
     r1 = 1100
-    theta0 = 4 / 6 * math.pi
-    theta1 = 1 / 12 * math.pi
-    thetar = 2 / 3 * math.pi
+    theta0 = 15 / 12 * math.pi
+    theta1 = 20 / 12 * math.pi
+    thetaw = 4 / 12 * math.pi
     k_shift = 20
-    rpe = RadialParElipses(parr, x0, y0, r0, r1, theta0, theta1, thetar, k_shift)
+    rpe = RadialParElipses(parr, x0, y0, r0, r1, theta0, theta1, thetaw, k_shift)
     print("Starting canvas generation at: " + txt.time_str(util.now()))
     rpe.draw_guidelines()
     print("Canvas generated at: " + txt.time_str(util.now()) + ", now drawing ...")
