@@ -52,18 +52,20 @@ if 0:
 if 1:
     parr = PixelArray(1000 * const.GOLDEN, 1000)
     x0 = 500
-    y0 = 200
+    y0 = 800
     r0 = 20
     r1 = 1100
-    theta0 = 15 / 12 * math.pi
-    theta1 = 20 / 12 * math.pi
-    thetaw = 4 / 12 * math.pi
+    theta0 = 10 / 12 * math.pi
+    theta1 = 16 / 12 * math.pi
+    thetaw = 14 / 12 * math.pi
     k_shift = 20
     rpe = RadialParElipses(parr, x0, y0, r0, r1, theta0, theta1, thetaw, k_shift)
     print("Starting canvas generation at: " + txt.time_str(util.now()))
+    rpe.draw_canvas(stencil.stencil)
     rpe.draw_guidelines()
     print("Canvas generated at: " + txt.time_str(util.now()) + ", now drawing ...")
     parr.show()
 
+print("Canvas rendered at: " + txt.time_str(util.now()))
 render_time = util.now() - start_time
 print("Total render time: " + txt.delta_str(render_time))

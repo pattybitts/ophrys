@@ -1,3 +1,5 @@
+import numpy as np
+
 from PIL import Image
 
 import util.const as const
@@ -16,6 +18,7 @@ class PixelArray():
     #TODO separate show and save
     def show(self):
         img = Image.new(mode="RGB", size=(self.x, self.y))
+        #this is a much faster parse than np.nedumerate?
         for x in range(self.x):
             for y in range(self.y):
                 px = self.arr[x][y]
@@ -28,6 +31,6 @@ class PixelArray():
 
     def setp(self, x, y, r, g, u):
         try:
-            self.arr[x][y] = Pixel(r, g, u)
+            self.arr[x][-1 * y].set_rgu(r, g, u)
         except:
             return
