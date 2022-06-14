@@ -75,23 +75,11 @@ class RadialParElipses():
         for i in range(3000):
             x, y = self.par_xy(i * frame_t)
             xp = int(round(x, 0)); yp = int(round(y, 0))
-            if xp <= self.parr.x and xp >= 0 and yp <= self.parr.y and yp >= 0: self.parr.setp(xp, yp, 255, 0, 0)
-
-            xm, ym = self.theta_offset(x, y, .25 * self.thetaw)
-            xp = int(round(xm, 0)); yp = int(round(ym, 0))
-            if xp <= self.parr.x and xp >= 0 and yp <= self.parr.y and yp >= 0: self.parr.setp(xp, yp, 255, 255, 0)
-
-            xm, ym = self.theta_offset(x, y, .5 * self.thetaw)
-            xp = int(round(xm, 0)); yp = int(round(ym, 0))
-            if xp <= self.parr.x and xp >= 0 and yp <= self.parr.y and yp >= 0: self.parr.setp(xp, yp, 0, 255, 0)
-
-            xm, ym = self.theta_offset(x, y, .75 * self.thetaw)
-            xp = int(round(xm, 0)); yp = int(round(ym, 0))
-            if xp <= self.parr.x and xp >= 0 and yp <= self.parr.y and yp >= 0: self.parr.setp(xp, yp, 0, 255, 255)
-
-            xm, ym = self.theta_offset(x, y, 1 * self.thetaw)
-            xp = int(round(xm, 0)); yp = int(round(ym, 0))
-            if xp <= self.parr.x and xp >= 0 and yp <= self.parr.y and yp >= 0: self.parr.setp(xp, yp, 0, 0, 255)                      
+            if xp <= self.parr.x and xp >= 0 and yp <= self.parr.y and yp >= 0: self.parr.setp(xp, yp, 255, 255, 255)
+            for j in range(4):
+                xm, ym = self.theta_offset(x, y, .25 * (j + 1) * self.thetaw)
+                xp = int(round(xm, 0)); yp = int(round(ym, 0))
+                if xp <= self.parr.x and xp >= 0 and yp <= self.parr.y and yp >= 0: self.parr.setp(xp, yp, 255, 255, 255)                     
 
     '''
     stencil data:

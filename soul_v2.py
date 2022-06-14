@@ -12,6 +12,7 @@ from obj.ColorPath import ColorPath
 from obj.TestDisplay import TestDisplay
 from obj.RadialParElipses import RadialParElipses
 
+#lets clean up this initialization so that we're only using it when we need it
 start_time = util.now()
 print("Intializing at: " + txt.time_str(util.now()))
 #profile = ds.load_pickle("output\profile_spec_test_a4_a5_22_05_26_2013_55")
@@ -36,13 +37,15 @@ if not ret.success(stencil):
 
 new_color_path = False
 cp_points = [
-    [4, 28, 134],
-    [85, 100, 170],
-    [114, 204, 244],
-    [249, 160, 6],
-    [240, 233, 57],
-    [255, 255, 255]
+    [4, 28, 134], #55/a1 only lowest end background
+    [85, 100, 170], #110/a2 most of the background chords
+    [114, 204, 244], #220/a3 low foreground melody
+    [249, 160, 6], #440/a4 main melody
+    [240, 233, 57], #880/a5 only a few notes on the edges
+    [255, 255, 255] #max
 ]
+#these context notes really indicate I should shift the colors more into blue
+#and we have this overlap problem
 
 cp_file = "{p}epiphany_cp".format(p=const.OUT_PATH)
 if new_color_path:
