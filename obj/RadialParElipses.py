@@ -101,7 +101,7 @@ class RadialParElipses():
     spike: width in Hz, centered around CoM at which a threshold (50% rn) of bin mass is reached
     '''
 
-    def draw_canvas(self, stencil):
+    def draw_canvas(self, stencil, color_path):
         frames = len(stencil)
         frame_t = 1 / frames
         for i in range(frames):
@@ -112,7 +112,9 @@ class RadialParElipses():
                 if b['peak'] < 60: continue
                 theta = self.note_theta(b['com'])
                 xt, yt = self.theta_offset(x, y, theta)
-                self.draw_elipse(xt, yt, 255, 255, 255)
+                r, g, u = color_path.freq_rgu(b['com'])
+                self.draw_elipse(xt, yt, r, g, u)
+            if i > 750: break
     
     def note_theta(self, com):
         base_note = 55

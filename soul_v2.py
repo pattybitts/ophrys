@@ -7,9 +7,8 @@ import util.ret as ret
 import util.txt as txt
 
 from obj.PixelArray import PixelArray
-from obj.AngularElipses import AngularElipses
-from obj.RGUElipseStencil import RGUElipseStencil
 from obj.SpecStencil import SpecStencil
+from obj.ColorPath import ColorPath
 from obj.TestDisplay import TestDisplay
 from obj.RadialParElipses import RadialParElipses
 
@@ -23,8 +22,8 @@ if not ret.success(profile):
 profile = profile[0:800,:]
 
 new_stencil = False
+stencil_file = "{p}spec_stencil_soul".format(p=const.OUT_PATH)
 
-stencil_file = "{p}spec_stencil_test".format(p=const.OUT_PATH)
 if new_stencil:
     print("Starting stencil generation at: " + txt.time_str(util.now()))
     stencil = SpecStencil(profile)
@@ -33,6 +32,31 @@ else:
     stencil = ds.load_pickle(stencil_file)
 if not ret.success(stencil):
     print("Invalid stencil")
+    quit()
+
+new_color_path = False
+cp_points = [
+    [4, 28, 134],
+    [85, 100, 170],
+    [114, 204, 244],
+    [249, 160, 6],
+    [240, 233, 57],
+    [255, 255, 255]
+]
+
+cp_file = "{p}epiphany_cp".format(p=const.OUT_PATH)
+if new_color_path:
+    print("Starting color_path generation at: " + txt.time_str(util.now()))
+    color_path = ColorPath()
+    base_note = 55
+    for c in cp_points:
+        color_path.add_point(base_note, c[0], c[1], c[2])
+        base_note *= 2
+    ds.dump_pickle(color_path, cp_file)
+else:
+    color_path = ds.load_pickle(cp_file)
+if not ret.success(color_path):
+    print("Invalid color_path")
     quit()
 
 if 0:
@@ -61,7 +85,7 @@ if 1:
     k_shift = 20
     rpe = RadialParElipses(parr, x0, y0, r0, r1, theta0, theta1, thetaw, k_shift)
     print("Starting canvas generation at: " + txt.time_str(util.now()))
-    rpe.draw_canvas(stencil.stencil)
+    rpe.draw_canvas(stencil.stencil, color_path)
     rpe.draw_guidelines()
     print("Canvas generated at: " + txt.time_str(util.now()) + ", now drawing ...")
     parr.show()
