@@ -5,8 +5,10 @@ from obj.Pixel import Pixel
 class ColorPath():
 
 
-    def __init__(self):
+    def __init__(self, cp_points):
         self.path = []
+        for c in cp_points:
+            self.add_point(c[0], c[1], c[2], c[3])
 
     def add_point(self, freq, r, g, u):
         self.path.append({'freq': freq, 'pix': Pixel(r, g, u)})

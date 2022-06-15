@@ -5,6 +5,7 @@ import util.util as util
 import util.ds as ds
 import util.ret as ret
 import util.txt as txt
+import util.calc as calc
 
 from obj.PixelArray import PixelArray
 from obj.SpecStencil import SpecStencil
@@ -12,19 +13,23 @@ from obj.ColorPath import ColorPath
 from obj.TestDisplay import TestDisplay
 from obj.RadialParElipses import RadialParElipses
 
+new_stencil = False
+draw_spec = False
+draw_canvas = True
+
 #lets clean up this initialization so that we're only using it when we need it
 start_time = util.now()
 print("Intializing at: " + txt.time_str(util.now()))
-#profile = ds.load_pickle("output\profile_spec_test_a4_a5_22_05_26_2013_55")
-profile = ds.load_pickle("output\profile_spec_epiphany_22_05_26_2051_53")
-if not ret.success(profile):
-    print("Invalid profile")
-    quit()
-profile = profile[0:800,:]
+if new_stencil or draw_spec:
+    print("Starting stencil generation at: " + txt.time_str(util.now()))
+    #profile = ds.load_pickle("output\profile_spec_test_a4_a5_22_05_26_2013_55")
+    profile = ds.load_pickle("output\profile_spec_epiphany_22_05_26_2051_53")
+    if not ret.success(profile):
+        print("Invalid profile")
+        quit()
+    profile = profile[0:800,:]
 
-new_stencil = False
 stencil_file = "{p}spec_stencil_soul".format(p=const.OUT_PATH)
-
 if new_stencil:
     print("Starting stencil generation at: " + txt.time_str(util.now()))
     stencil = SpecStencil(profile)
@@ -34,35 +39,23 @@ else:
 if not ret.success(stencil):
     print("Invalid stencil")
     quit()
+print("Stencil Frames: " + str(len(stencil.stencil)))
 
-new_color_path = False
-cp_points = [
-    [4, 28, 134], #55/a1 only lowest end background
-    [85, 100, 170], #110/a2 most of the background chords
-    [114, 204, 244], #220/a3 low foreground melody
-    [249, 160, 6], #440/a4 main melody
-    [240, 233, 57], #880/a5 only a few notes on the edges
-    [255, 255, 255] #max
+cp0_points = [
+    [calc.note_freq(55, 3), 4, 28, 134],
+    [calc.note_freq(110, 3), 85, 100, 170],
+    [calc.note_freq(220, 3), 145, 146, 191],
+    [calc.note_freq(440, 2), 114, 204, 244]
 ]
-#these context notes really indicate I should shift the colors more into blue
-#and we have this overlap problem
+cp1_points = [
+    [calc.note_freq(440, 3), 249, 160, 6],
+    [calc.note_freq(880, 3), 240, 233, 57],
+    [calc.note_freq(1760, 3), 255, 255, 255]
+]
+cp0 = ColorPath(cp0_points)
+cp1 = ColorPath(cp1_points)
 
-cp_file = "{p}epiphany_cp".format(p=const.OUT_PATH)
-if new_color_path:
-    print("Starting color_path generation at: " + txt.time_str(util.now()))
-    color_path = ColorPath()
-    base_note = 55
-    for c in cp_points:
-        color_path.add_point(base_note, c[0], c[1], c[2])
-        base_note *= 2
-    ds.dump_pickle(color_path, cp_file)
-else:
-    color_path = ds.load_pickle(cp_file)
-if not ret.success(color_path):
-    print("Invalid color_path")
-    quit()
-
-if 0:
+if draw_spec:
     x, y  = profile.shape
     parr = PixelArray(y, x)
     td = TestDisplay(parr, np.amin(profile), np.amax(profile))
@@ -76,20 +69,29 @@ if 0:
     print("Canvas generated at: " + txt.time_str(util.now()) + ", now drawing ...")
     parr.show()
 
-if 1:
+if draw_canvas:
     parr = PixelArray(1000 * const.GOLDEN, 1000)
     x0 = 500
     y0 = 800
     r0 = 20
-    r1 = 1100
-    theta0 = 10 / 12 * math.pi
-    theta1 = 16 / 12 * math.pi
-    thetaw = 14 / 12 * math.pi
+    r1 = 700
     k_shift = 20
-    rpe = RadialParElipses(parr, x0, y0, r0, r1, theta0, theta1, thetaw, k_shift)
+    #color_path_0
+    itheta0 = 10 / 12 * math.pi
+    curve0 = 3 / 12 * math.pi
+    width0 = 14 / 12 * math.pi
+    #color_path_1
+    itheta1 = 14 / 12 * math.pi
+    curve1 = 3 / 12 * math.pi
+    width1 = 6 / 12 * math.pi
+
     print("Starting canvas generation at: " + txt.time_str(util.now()))
-    rpe.draw_canvas(stencil.stencil, color_path)
-    rpe.draw_guidelines()
+    rpe0 = RadialParElipses(x0, y0, r0, r1, itheta0, curve0, width0, k_shift)
+    rpe1 = RadialParElipses(x0, y0, r0, r1, itheta1, curve1, width1, k_shift)
+    #parr = RadialParElipses.draw_canvas(parr, stencil.stencil, [[cp0, rpe0], [cp1, rpe1]])
+    parr = RadialParElipses.draw_canvas(parr, stencil.stencil, [[cp0, rpe0]])
+    parr = rpe0.draw_guidelines(parr)
+    #parr = rpe1.draw_guidelines(parr)
     print("Canvas generated at: " + txt.time_str(util.now()) + ", now drawing ...")
     parr.show()
 

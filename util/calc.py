@@ -52,5 +52,8 @@ def spike_score(points, mass, center, mass_th=.5):
         r += 1
     return mass_th * r * 2 * const.FREQ_INC / (spike_mass / mass)
 
+def note_freq(f0, steps):
+    return f0 * 2 ** (steps / 12)
+
 def note_steps(f0, f1):
     return 12 * math.log(f1 / f0) / math.log(2)
