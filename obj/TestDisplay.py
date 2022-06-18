@@ -17,7 +17,6 @@ class TestDisplay():
         self.max = max
 
     def draw_array(self, nparr):
-        nparr = util.swap_axes(nparr)
         rgumod = 255 / (self.max - self.min)
         for idx, val in np.ndenumerate(nparr):
             val  = int(abs(val * rgumod))
@@ -26,7 +25,6 @@ class TestDisplay():
 
     def peak_overlay(self, nparr):
         frames = []
-        nparr = util.swap_axes(nparr)
         for frame in nparr:
             notes = []
             prev_x = 0
@@ -57,7 +55,6 @@ class TestDisplay():
                 self.parr.setp(i, n[0], c[0], c[1], c[2])
 
     def heat_overlay(self, nparr):
-        nparr = util.swap_axes(nparr)
         for idx, val in np.ndenumerate(nparr):
             if val > -10: self.parr.setp(idx[0], idx[1], 0, 0, 255)
             elif val > -20: self.parr.setp(idx[0], idx[1], 0, 255, 0)
@@ -65,7 +62,6 @@ class TestDisplay():
             if idx[0] >= 5000: break
 
     def octave_overlay(self, nparr):
-        nparr = util.swap_axes(nparr)
         a_notes = [110, 220, 440, 880, 1760, 3520]
         for idx, val in np.ndenumerate(nparr):
             hz = calc.freq(idx[1])
@@ -75,7 +71,6 @@ class TestDisplay():
                     break
 
     def note_overlay(self, nparr):
-        nparr = util.swap_axes(nparr)
         note_bins = ds.load_pickle("input\\note_bins")
         for idx, val in np.ndenumerate(nparr):
             hz = calc.freq(idx[1])
@@ -84,8 +79,15 @@ class TestDisplay():
                     self.parr.setp(idx[0], idx[1], 0, 255, 255)
                     break
 
+    '''
+    stencil data:
+    amp: sum of bin amplitudes above a cutoff threshold (20 rn) averaged over valid points
+    com: center of mass in Hz of note
+    peak: highest bin amplitude (0-80 dB)
+    spike: width in Hz, centered around CoM at which a threshold (50% rn) of bin mass is reached
+    '''
+
     def com_overlay(self, nparr, stencil):
-        nparr = util.swap_axes(nparr)
         for i in range(len(stencil)):
             s = stencil[i]
             for n in s: 
@@ -95,50 +97,17 @@ class TestDisplay():
                 if amp_val > .3: self.parr.setp(i, y, 255, 0, 0)
                 if peak_val > .7: self.parr.setp(i, y, 0, 255, 0)
                 if n['spike'] < 10: self.parr.setp(i, y, 0, 0, 255)
-    
-    '''
-    def __init__(self, profile):
-        self.profile = profile
-        self.amin = np.amin(self.profile)
-        amax  = np.amax(self.profile)
-        self.active_val_th = self.amin + .1 * abs(self.amin)
-        self.active_slope_th = (amax - self.amin) / 3
-        self.bin_width = 10.76
-        self.stencil = self.generate_note_list()
 
-    def generate_note_list(self):
-        profile = util.swap_axes(self.profile)
-        stencil = []
-        for frame in profile:
-            notes = []
-            prev_bin = self.amin; p_prev_bin = self.amin
-            position = self.bin_width / 2
-            note_status = "none" #none, rising, falling
-            com_num = 0
-            com_den = 0
-            for bin in frame:
-                note_width = position * 2 ** (1/12) - position * .5 ** (1/12)
-                slope = (bin - p_prev_bin) / (note_width * 2) 
-                if note_status == "none" and bin >= self.active_val_th and slope >= self.active_slope_th / (note_width * 2):
-                    note_status = "rising"
-                elif note_status == "rising" and slope <= self.active_slope_th / (note_width * -2):
-                    note_status = "falling"
-                elif note_status == "falling" and bin <= self.active_val_th or abs(slope) < self.active_slope_th:
-                    note_status = "none"
-                    if com_den == 0: continue
-                    com = com_num / com_den
-                    mass = com_den / self.bin_width
-                    notes.append([round(com, 3), round(mass, 3)])
-                    com_num = 0; com_den = 0
-                if note_status != "none":
-                    com_num += (bin - self.amin) * position
-                    com_den += (bin - self.amin)
-                position += self.bin_width
-                p_prev_bin = prev_bin
-                prev_bin = bin
-            stencil.append(copy.copy(notes))
-        print("bueler?")
-        for s in stencil:
-            if len(s) > 0:
-                print(s)    
-    '''
+    def color_overlay(self, nparr, stencil, color_map):
+        for i in range(len(stencil)):
+            frame = stencil[i]
+            for j in range(len(frame)):
+                bin = frame[j]
+                if bin['peak'] < 50: continue
+                #we might just center these on bins eventually
+                y = int(round((bin['com'] - const.FREQ_INC / 2) / const.FREQ_INC))
+                pixel = color_map[j]
+                #amp_val = bin['amp'] / (self.max - self.min)
+                amp_val = (bin['peak'] - 50) / 30
+                pixel.saturate(amp_val)
+                self.parr.setp(y, i, pixel.r, pixel.g, pixel.u)

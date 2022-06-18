@@ -19,10 +19,13 @@ def bin_peak(points):
     return max
 
 def bin_mass(points, threshold=None):
+    count = 0
     mass = 0
     for p in points:
         if threshold and p[1] < threshold: continue
+        count += 1
         mass += p[1]
+    if count > 0: return mass / count
     return mass
 
 #i should figure out how i want to structure returns on this
