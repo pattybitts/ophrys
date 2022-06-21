@@ -6,6 +6,7 @@ import util.ds as ds
 import util.ret as ret
 import util.txt as txt
 import util.calc as calc
+import util.pixel as pix
 
 from obj.PixelArray import PixelArray
 from obj.SpecStencil import SpecStencil
@@ -13,7 +14,6 @@ from obj.ColorPath import ColorPath
 from obj.TestDisplay import TestDisplay
 from obj.RadialParElipses import RadialParElipses
 from obj.ColorMap import ColorMap
-from obj.Pixel import Pixel
 
 new_stencil = False
 draw_spec = True
@@ -47,10 +47,10 @@ layer_0 = {
     'start': 3,
     'end': 38,
     'path': [
-        [0, Pixel(0x04, 0x2c, 0x86)],   #4, 44, 134
-        [3.66, Pixel(0x55, 0x64, 0xaa)], #85, 100, 170
-        [7.33, Pixel(0x91, 0x92, 0xbf)], #145, 146, 191
-        [11, Pixel(0x7c, 0xcc, 0xf4)] #124, 204, 244
+        [0, 0x04, 0x2c, 0x86],   #4, 44, 134
+        [3.66, 0x55, 0x64, 0xaa], #85, 100, 170
+        [7.33, 0x91, 0x92, 0xbf], #145, 146, 191
+        [11, 0x7c, 0xcc, 0xf4] #124, 204, 244
     ]
 }
 #NOTE I made some changes here to try to clarify my saturation questions
@@ -58,8 +58,8 @@ layer_1 = {
     'start': 39,
     'end': 62,
     'path': [
-        [0, Pixel(0x40, 0xa0, 0x06)], #249, 160, 6
-        [11, Pixel(0x40, 0xe4, 0x34)] #238, 228, 52
+        [0, 0xf9, 0xa0, 0x06], #249, 160, 6
+        [11, 0xee, 0xe4, 0x34] #238, 228, 52
     ]
 }
 color_map = ColorMap([layer_0, layer_1])

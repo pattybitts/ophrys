@@ -1,9 +1,7 @@
 import util.calc as calc
 
-from obj.Pixel import Pixel
-
+#TODO This need a big refactoring pass if i decide to pick it up again
 class ColorPath():
-
 
     def __init__(self, cp_points):
         self.path = []
@@ -11,7 +9,7 @@ class ColorPath():
             self.add_point(c[0], c[1], c[2], c[3])
 
     def add_point(self, freq, r, g, u):
-        self.path.append({'freq': freq, 'pix': Pixel(r, g, u)})
+        self.path.append({'freq': freq, 'pix': (r, g, u)})
 
     def freq_rgu(self, freq):
         len_points = len(self.path)

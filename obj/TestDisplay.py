@@ -6,6 +6,7 @@ import util.calc as calc
 import util.const as const
 import util.util as util
 import util.ds as ds
+import util.pixel as pix
 
 from obj.PixelArray import PixelArray
 
@@ -100,14 +101,15 @@ class TestDisplay():
 
     def color_overlay(self, stencil, color_map):
         for i in range(len(stencil)):
-            frame = copy.copy(stencil[i])
+            frame = stencil[i]
             for j in range(len(frame)):
-                bin = copy.copy(frame[j])
+                bin = frame[j]
                 if bin['peak'] < 50: continue
                 #we might just center these on bins eventually
-                y = int(round((bin['com'] - const.FREQ_INC / 2) / const.FREQ_INC))
-                pixel = copy.copy(color_map[j])
+                y = int(round((bin['freq'] - const.FREQ_INC / 2) / const.FREQ_INC))
+                rgu = color_map[j]
                 #amp_val = bin['amp'] / (self.max - self.min)
                 amp_val = (bin['peak'] - 50) / 30
-                pixel.saturate(amp_val)
-                self.parr.setp(y, i, pixel.r, pixel.g, pixel.u)
+                rgu = pix.saturate(rgu, amp_val)
+                self.parr.setp(y, i, rgu)
+                self.parr.setp(y+1, i, rgu)

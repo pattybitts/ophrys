@@ -37,12 +37,12 @@ class SpecStencil:
                         note.append([hz, frame[i] - amin])
                     elif hz > h:
                         break
-                if not note: continue
+                if not note: notes.append({'freq': n, 'amp': 0, 'com': n, 'spike': 0, 'peak': 0}); continue
                 #calculating bin characteristics
                 amp  = calc.bin_mass(note, 20)
                 com = calc.bin_com(note)
                 spike = calc.spike_score(note, calc.bin_mass(note), com)
                 peak  = calc.bin_peak(note)
-                notes.append({'amp': amp, 'com': com, 'spike': spike, 'peak': peak})
+                notes.append({'freq': n, 'amp': amp, 'com': com, 'spike': spike, 'peak': peak})
             stencil.append(copy.copy(notes))
         return stencil

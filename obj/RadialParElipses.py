@@ -94,6 +94,7 @@ class RadialParElipses():
     spike: width in Hz, centered around CoM at which a threshold (50% rn) of bin mass is reached
     '''
 
+    #TODO this still needs to be updated to the colormap paradigm
     @staticmethod
     def draw_canvas(parr, stencil, path_rpes):
         frames = len(stencil)
