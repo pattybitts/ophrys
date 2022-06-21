@@ -53,12 +53,13 @@ layer_0 = {
         [11, Pixel(0x7c, 0xcc, 0xf4)] #124, 204, 244
     ]
 }
+#NOTE I made some changes here to try to clarify my saturation questions
 layer_1 = {
     'start': 39,
     'end': 62,
     'path': [
-        [0, Pixel(0x30, 0xa0, 0x06)], #249, 160, 6
-        [11, Pixel(0x30, 0xe4, 0x34)] #238, 228, 52
+        [0, Pixel(0x40, 0xa0, 0x06)], #249, 160, 6
+        [11, Pixel(0x40, 0xe4, 0x34)] #238, 228, 52
     ]
 }
 color_map = ColorMap([layer_0, layer_1])
@@ -73,8 +74,8 @@ if draw_spec:
     #td.peak_overlay(profile)
     #td.octave_overlay(profile)
     #td.note_overlay(profile)
-    #td.com_overlay(profile, stencil.stencil)
-    td.color_overlay(profile, stencil.stencil, color_map.map)
+    #td.com_overlay(stencil.stencil)
+    td.color_overlay(stencil.stencil, color_map.map)
     print("Spec generated at: " + txt.time_str(util.now()) + ", now drawing ...")
     parr.show()
 
@@ -98,7 +99,7 @@ if draw_canvas:
     rpe0 = RadialParElipses(x0, y0, r0, r1, itheta0, curve0, width0, k_shift)
     rpe1 = RadialParElipses(x0, y0, r0, r1, itheta1, curve1, width1, k_shift)
     #parr = RadialParElipses.draw_canvas(parr, stencil.stencil, [[cp0, rpe0], [cp1, rpe1]])
-    parr = RadialParElipses.draw_canvas(parr, stencil.stencil, [[cp0, rpe0]])
+    #parr = RadialParElipses.draw_canvas(parr, stencil.stencil, [[cp0, rpe0]])
     parr = rpe0.draw_guidelines(parr)
     #parr = rpe1.draw_guidelines(parr)
     print("Canvas generated at: " + txt.time_str(util.now()) + ", now drawing ...")

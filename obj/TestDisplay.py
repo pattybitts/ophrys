@@ -87,7 +87,7 @@ class TestDisplay():
     spike: width in Hz, centered around CoM at which a threshold (50% rn) of bin mass is reached
     '''
 
-    def com_overlay(self, nparr, stencil):
+    def com_overlay(self, stencil):
         for i in range(len(stencil)):
             s = stencil[i]
             for n in s: 
@@ -98,15 +98,15 @@ class TestDisplay():
                 if peak_val > .7: self.parr.setp(i, y, 0, 255, 0)
                 if n['spike'] < 10: self.parr.setp(i, y, 0, 0, 255)
 
-    def color_overlay(self, nparr, stencil, color_map):
+    def color_overlay(self, stencil, color_map):
         for i in range(len(stencil)):
-            frame = stencil[i]
+            frame = copy.copy(stencil[i])
             for j in range(len(frame)):
-                bin = frame[j]
+                bin = copy.copy(frame[j])
                 if bin['peak'] < 50: continue
                 #we might just center these on bins eventually
                 y = int(round((bin['com'] - const.FREQ_INC / 2) / const.FREQ_INC))
-                pixel = color_map[j]
+                pixel = copy.copy(color_map[j])
                 #amp_val = bin['amp'] / (self.max - self.min)
                 amp_val = (bin['peak'] - 50) / 30
                 pixel.saturate(amp_val)
