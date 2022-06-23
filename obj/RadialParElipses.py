@@ -5,6 +5,7 @@ import numpy as np
 import util.calc as calc
 import util.const as const
 import util.util as util
+import util.pixel as pix
 
 from obj.PixelArray import PixelArray
 
@@ -27,7 +28,8 @@ class RadialParElipses():
         self.k_shift = k_shift
 
     #TODO simplification pass
-    def draw_elipse(self, parr, x1, y1, r, g, u, dr=math.pi/200, lp=200):
+    def draw_elipse(self, parr, x1, y1, rgu, dr=100, lp=100):
+        dr = math.pi/dr
         xc = (self.x0 + x1) / 2
         yc = (self.y0 + y1) / 2
         k = calc.distance(self.x0, self.y0, x1, y1) + self.k_shift
@@ -47,7 +49,7 @@ class RadialParElipses():
                         yp = int(round(y, 0))
                         if xp != xpp or yp != ypp:
                             if xp < parr.x and xp >= 0 and yp <= parr.y and yp > 0:
-                                parr.setp(xp, yp, r, g, u)
+                                parr.setp(xp, yp, rgu)
                                 xpp = xp; ypp = yp
                                 #we may replace this with a simple counter so that we draw x pixels beyond r
                             break
@@ -66,7 +68,6 @@ class RadialParElipses():
         y = self.y0 + r * math.sin(theta)
         return x, y
 
-    #let's just throw some angels at the wall
     def theta_offset(self, x, y, theta):
         r = calc.distance(self.x0, self.y0, x, y)
         lx = x - self.x0; ly = y - self.y0
@@ -80,10 +81,10 @@ class RadialParElipses():
         frame_t = 1 / 3000
         for i in range(3000):
             x, y = self.par_xy(i * frame_t)
-            for j in range(3):
-                xm, ym = self.theta_offset(x, y, .5 * j * self.width)
+            for j in range(2):
+                xm, ym = self.theta_offset(x, y, 1.0 * j * self.width)
                 xp = int(round(xm, 0)); yp = int(round(ym, 0))
-                if xp <= parr.x and xp >= 0 and yp <= parr.y and yp >= 0: parr.setp(xp, yp, 255, 255, 255)       
+                if xp <= parr.x and xp >= 0 and yp <= parr.y and yp >= 0: parr.setp(xp, yp, (255, 255, 255))       
         return parr
 
     '''
@@ -96,29 +97,35 @@ class RadialParElipses():
 
     #TODO this still needs to be updated to the colormap paradigm
     @staticmethod
-    def draw_canvas(parr, stencil, path_rpes):
-        frames = len(stencil)
-        frame_t = 1 / frames
-        for i in range(frames):
+    def draw_canvas(parr, stencil, map_rpes, res_pars):
+        len_frames = len(stencil)
+        frame_t = 1 / len_frames
+        for i in range(len_frames):
             t = 1 - i * frame_t
-            for prpe in path_rpes:
-                color_path = prpe[0]
-                l = color_path.path[0]['freq'] * .5 ** (1/24); h = color_path.path[-1]['freq'] * 2 ** (1/24)
-                rpe = prpe[1]
+            for mr in map_rpes:
+                color_map = mr[0]
+                cm_min = None
+                cm_max = len(color_map) - 1
+                for j in range(len(color_map)):
+                    if not color_map[j] is None and cm_min is None: cm_min = j
+                    if color_map[j] is None and not cm_min is None: cm_max = j; break
+                rpe = mr[1]
                 x, y = rpe.par_xy(t)
                 bins = stencil[i]
-                for b in bins:
-                    if b['peak'] < 60: continue
-                    if b['com'] < l or b['com'] > h: continue
-                    theta = rpe.note_theta(color_path, b['com'])
+                for j in range(len(bins)):
+                    b = bins[j]
+                    #we could use another module to create consistent filtering between test and elipse
+                    #(it's unlikely i'll actually do that)
+                    if b['peak'] < 50: continue
+                    if color_map[j] is None: continue
+                    amp_val = (b['peak'] - 50) / 30 * 1.5
+                    if amp_val > 1: amp_val = 1
+                    theta = rpe.note_theta(cm_min, cm_max, j)
                     xt, yt = rpe.theta_offset(x, y, theta)
-                    r, g, u = color_path.freq_rgu(b['com'])
-                    rpe.draw_elipse(parr, xt, yt, r, g, u)
-            if i > 10: break
+                    rgu = pix.saturate(color_map[j], amp_val)
+                    rpe.draw_elipse(parr, xt, yt, rgu, res_pars[1], res_pars[2])
+            if res_pars[0] and i > res_pars[0]: break
         return parr
     
-    def note_theta(self, color_path, com):
-        base_note = color_path.path[0]['freq']
-        max_steps = calc.note_steps(base_note, color_path.path[-1]['freq'])
-        steps = calc.note_steps(base_note, com)
-        return steps / max_steps * self.width
+    def note_theta(self, min, max, bin):
+        return (bin - min) / (max - min) * self.width

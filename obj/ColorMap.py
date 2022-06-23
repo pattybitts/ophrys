@@ -4,7 +4,7 @@ import util.pixel as pix
 class ColorMap():
 
     def __init__(self, layers):
-        self.map = [(0, 0, 0) for i in range(72)]
+        self.map = [None for i in range(72)]
         for l in layers:
             self.add_layer(l)
 
