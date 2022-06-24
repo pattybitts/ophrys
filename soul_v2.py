@@ -98,15 +98,14 @@ if draw_canvas:
     width1 = 3 / 12 * math.pi
     #render resolution parameters: frames, dr, lp
     #TODO print these!
-    res_par = None, 200, 100
+    res_par = None, 60, 30
 
     print("Starting canvas generation at: " + txt.time_str(util.now()))
     rpe0 = RadialParElipses(x0, y0, r0, r1, itheta0, curve0, width0, k_shift)
     rpe1 = RadialParElipses(x0, y0, r0, r1, itheta1, curve1, width1, k_shift)
     parr = RadialParElipses.draw_canvas(parr, stencil.stencil, [[color_map_0.map, rpe0], [color_map_1.map, rpe1]], res_par)
-    parr = rpe0.draw_guidelines(parr)
-    parr = rpe1.draw_guidelines(parr)
-
+    #parr = rpe0.draw_guidelines(parr)
+    #parr = rpe1.draw_guidelines(parr)
     print("Canvas generated at: " + txt.time_str(util.now()) + ", now drawing ...")
     parr.show()
 

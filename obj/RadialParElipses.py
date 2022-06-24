@@ -9,6 +9,8 @@ import util.pixel as pix
 
 from obj.PixelArray import PixelArray
 
+#are these speckles changes large enough to merit a new class
+#(hush db, I'm trying to work)
 class RadialParElipses():
 
     def __init__(self, x0, y0, r0, r1, itheta, curve, width, k_shift):
@@ -28,11 +30,16 @@ class RadialParElipses():
         self.k_shift = k_shift
 
     #TODO simplification pass
-    def draw_elipse(self, parr, x1, y1, rgu, dr=100, lp=100):
+    #not quite sure where I can streamline this
+    #i have a sense that there's some way to more intelligently hone in the radius?
+    #sort of a psudo pid based on the change in k0/k1 over the first two iterations?
+    #might do wonders for my render time
+    #and why am i here if not to solve some fun little puzzles?
+    @staticmethod
+    def draw_elipse(parr, x0, y0, x1, y1, k, rgu, dr=100, lp=100):
         dr = math.pi/dr
-        xc = (self.x0 + x1) / 2
-        yc = (self.y0 + y1) / 2
-        k = calc.distance(self.x0, self.y0, x1, y1) + self.k_shift
+        xc = (x0 + x1) / 2
+        yc = (y0 + y1) / 2
         for i in range(2):
             theta = 0
             direction = 1 if i == 0 else -1
@@ -42,9 +49,8 @@ class RadialParElipses():
                 x = xc; xp = xc; xpp = None
                 y = yc; yp = yc; ypp = None
                 for j in range(lp):
-                    d0 = calc.distance(self.x0, self.y0, x, y)
-                    d1 = calc.distance(x1, y1, x, y)
-                    if d0 + d1 >= k:
+                    d = calc.distance(x0, y0, x, y) + calc.distance(x1, y1, x, y)
+                    if d >= k:
                         xp = int(round(x, 0))
                         yp = int(round(y, 0))
                         if xp != xpp or yp != ypp:
@@ -93,11 +99,11 @@ class RadialParElipses():
     com: center of mass in Hz of note
     peak: highest bin amplitude (0-80 dB)
     spike: width in Hz, centered around CoM at which a threshold (50% rn) of bin mass is reached
+    #^should this be normalized to bin width? filtered for negligible sums?
     '''
 
-    #TODO this still needs to be updated to the colormap paradigm
     @staticmethod
-    def draw_canvas(parr, stencil, map_rpes, res_pars):
+    def draw_canvas(parr, stencil, map_rpes, res_pars, speckles=True):
         len_frames = len(stencil)
         frame_t = 1 / len_frames
         for i in range(len_frames):
@@ -116,16 +122,32 @@ class RadialParElipses():
                     b = bins[j]
                     #we could use another module to create consistent filtering between test and elipse
                     #(it's unlikely i'll actually do that)
-                    if b['peak'] < 50: continue
+                    if b['peak'] < 60: continue
                     if color_map[j] is None: continue
-                    amp_val = (b['peak'] - 50) / 30 * 1.5
+                    amp_val = (b['peak'] - 40) / 40 * 1.5
                     if amp_val > 1: amp_val = 1
+                    sharp_val = (b['spike'] / 40)
                     theta = rpe.note_theta(cm_min, cm_max, j)
                     xt, yt = rpe.theta_offset(x, y, theta)
+                    if speckles:
+                        x0, y0, k = rpe.elipse_shape(xt, yt)
+                    else:
+                        x0 = rpe.x0; y0 = rpe.y0
+                        k = calc.distance(rpe.x0, rpe.y0, xt, yt) + rpe.k_shift
                     rgu = pix.saturate(color_map[j], amp_val)
-                    rpe.draw_elipse(parr, xt, yt, rgu, res_pars[1], res_pars[2])
+                    RadialParElipses.draw_elipse(parr, x0, y0, xt, yt, k, rgu, res_pars[1], res_pars[2])
             if res_pars[0] and i > res_pars[0]: break
         return parr
     
     def note_theta(self, min, max, bin):
         return (bin - min) / (max - min) * self.width
+
+    def elipse_shape(self, x, y, sharp_val=.8):
+        #l = self.r1 / 200 #r1/200 is just as arbitrary as a flat value
+        l = 200
+        r = calc.distance(self.x0, self.y0, x, y)
+        k = sharp_val * l
+        f = 2 * k - l
+        xf = (self.x0 - x) * f / r + x
+        yf = (self.y0 - y) * f / r + y
+        return xf, yf, k
