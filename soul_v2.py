@@ -16,8 +16,8 @@ from obj.RadialParElipses import RadialParElipses
 from obj.ColorMap import ColorMap
 
 new_stencil = False
-draw_spec = False
-draw_canvas = True
+draw_spec = True
+draw_canvas = False
 
 #lets clean up this initialization so that we're only using it when we need it
 start_time = util.now()
@@ -71,7 +71,7 @@ if draw_spec:
     parr = PixelArray(x, y)
     td = TestDisplay(parr, np.amin(profile), np.amax(profile))
     print("Starting visual spec generation at: " + txt.time_str(util.now()))
-    #td.draw_array(profile)
+    td.draw_array(profile)
     #td.heat_overlay(profile)
     #td.peak_overlay(profile)
     #td.octave_overlay(profile)

@@ -21,7 +21,7 @@ class TestDisplay():
         rgumod = 255 / (self.max - self.min)
         for idx, val in np.ndenumerate(nparr):
             val  = int(abs(val * rgumod))
-            self.parr.setp(idx[0], idx[1], val, val, val)
+            self.parr.setp(idx[0], idx[1], (val, val, val))
             if idx[0] >= 5000: break
 
     def peak_overlay(self, nparr):
@@ -53,7 +53,7 @@ class TestDisplay():
             f = frames[i]
             for n in f:
                 c = [255, 0, 0] if n[1] == 'max' else [0, 255, 0]
-                self.parr.setp(i, n[0], c[0], c[1], c[2])
+                self.parr.setp(i, n[0], (c[0], c[1], c[2]))
 
     def heat_overlay(self, nparr):
         for idx, val in np.ndenumerate(nparr):
@@ -103,13 +103,12 @@ class TestDisplay():
         for i in range(len(stencil)):
             frame = stencil[i]
             for j in range(len(frame)):
-                bin = frame[j]
-                if bin['peak'] < 50: continue
-                #we might just center these on bins eventually
-                y = int(round((bin['freq'] - const.FREQ_INC / 2) / const.FREQ_INC))
                 rgu = color_map[j]
-                #amp_val = bin['amp'] / (self.max - self.min)
-                amp_val = (bin['peak'] - 50) / 30
-                rgu = pix.saturate(rgu, amp_val)
+                if not rgu: continue
+                bin = frame[j]
+                if bin['peak'] < .75: continue
+                #we might just center these on bins eventually #and now eventually is now
+                y = int(round((bin['freq'] - const.FREQ_INC / 2) / const.FREQ_INC))
+                rgu = pix.saturate(rgu, bin['peak'])
                 self.parr.setp(y, i, rgu)
                 self.parr.setp(y+1, i, rgu)
