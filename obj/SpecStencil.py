@@ -21,11 +21,11 @@ class SpecStencil:
         #creating stencil
         profile = util.swap_axes(self.profile)
         amin = np.amin(profile)
-        stencil = {'freq':[], 'amp':[], 'spike':[], 'peak':[]}
+        stencil = {'freq':[], 'amp':[], 'spike':[], 'peak':[], 'com':[]}
         for i in range(len(profile)):
             frame = profile[i]
             #separating spec values into appropriate bins
-            freqs = []; amps = []; spikes = []; peaks = []
+            freqs = []; amps = []; spikes = []; peaks = []; coms = []
             for n in note_bins:
                 note = []
                 l = n * .5 ** (1/24)
@@ -39,15 +39,17 @@ class SpecStencil:
                     elif hz > h:
                         break
                 if not note:
+                    com = n
                     amp = 0
                     spike = 0
                     peak = 0
                 else:
-                    amp  = SpecStencil.bin_mass(note, 20)
-                    spike = SpecStencil.spike_score(note, SpecStencil.bin_mass(note), n)
+                    com = SpecStencil.bin_com(note, 20)
+                    amp  = SpecStencil.bin_mass(note, 10)
+                    spike = SpecStencil.spike_score(note, com)
                     peak  = SpecStencil.bin_peak(note)
-                freqs.append(n); amps.append(amp); spikes.append(spike); peaks.append(peak)
-            for x in [('freq', freqs), ('amp', amps), ('spike', spikes), ('peak', peaks)]:
+                freqs.append(n); amps.append(amp); spikes.append(spike); peaks.append(peak); coms.append(com)
+            for x in [('freq', freqs), ('amp', amps), ('spike', spikes), ('peak', peaks), ('com', coms)]:
                 stencil[x[0]].append(copy.copy(x[1]))
         #oof. ok at this point we should have a stencil with distinct np-compatible arrays
         #new_stencil = np.ndarray((len(stencil['freq']), len(stencil['freq'][0])))
@@ -61,7 +63,7 @@ class SpecStencil:
             amin  = np.amin(val)
             amax  = np.amax(val)
             for idx, v in np.ndenumerate(val):
-                new_stencil[idx[0]][idx[1]][key] = v if key == 'freq' else (v - amin) / (amax - amin)
+                new_stencil[idx[0]][idx[1]][key] = v if key == 'freq' or key == 'com' else (v - amin) / (amax - amin)
         return new_stencil
 
     #static bin computation functions
@@ -85,10 +87,11 @@ class SpecStencil:
 
     #i should figure out how i want to structure returns on this
     @staticmethod
-    def bin_com(points):
+    def bin_com(points, th=20):
         numerator = 0
         denominator = 0
         for p in points:
+            if p[1] < th: continue
             numerator += p[0] * p[1]
             denominator += p[1]
         if denominator == 0: return 0
@@ -96,17 +99,20 @@ class SpecStencil:
 
     #returns the width in hz at which the mass of the spike reaches the given percentage of the bin's mass
     @staticmethod
-    def spike_score(points, mass, center, mass_th=.5):
+    def spike_score(points, center, mass_th=0, spike_th=.25):
+        mass = 0
+        for p in points:
+            if p[1] >= mass_th: mass += p[1]
         if mass == 0: return 0
         center_idx = 0
         for p in points:
-            if abs(p[0] - center) <= const.FREQ_INC / 2: center_idx = points.index(p)
+            if abs(p[0] - center) <= const.FREQ_INC / 2: center_idx = points.index(p); break
         spike_mass = points[center_idx][1]
         r = 1
-        while spike_mass / mass < mass_th:
+        while spike_mass / mass < spike_th:
             rl = center_idx - r
             rh = center_idx + r
             if rl >= 0: spike_mass += points[rl][1]
             if rh < len(points): spike_mass += points[rh][1]
-            r += 1
-        return mass_th * r * 2 * const.FREQ_INC / (spike_mass / mass)
+            r += 2
+        return (r / len(points)) * (spike_th / (spike_mass / mass))

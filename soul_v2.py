@@ -10,7 +10,6 @@ import util.pixel as pix
 
 from obj.PixelArray import PixelArray
 from obj.SpecStencil import SpecStencil
-from obj.ColorPath import ColorPath
 from obj.TestDisplay import TestDisplay
 from obj.RadialParElipses import RadialParElipses
 from obj.ColorMap import ColorMap
@@ -72,12 +71,13 @@ if draw_spec:
     td = TestDisplay(parr, np.amin(profile), np.amax(profile))
     print("Starting visual spec generation at: " + txt.time_str(util.now()))
     td.draw_array(profile)
+    td.bin_val_overlay(stencil.stencil, "peak")
     #td.heat_overlay(profile)
     #td.peak_overlay(profile)
     #td.octave_overlay(profile)
     #td.note_overlay(profile)
     #td.com_overlay(stencil.stencil)
-    td.color_overlay(stencil.stencil, color_map_full.map)
+    #td.color_overlay(stencil.stencil, color_map_full.map)
     print("Spec generated at: " + txt.time_str(util.now()) + ", now drawing ...")
     parr.show()
 

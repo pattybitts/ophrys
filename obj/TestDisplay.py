@@ -24,44 +24,6 @@ class TestDisplay():
             self.parr.setp(idx[0], idx[1], (val, val, val))
             if idx[0] >= 5000: break
 
-    def peak_overlay(self, nparr):
-        frames = []
-        for frame in nparr:
-            notes = []
-            prev_x = 0
-            prev_dx = 0
-            for i in range(0, len(frame), 10):
-                field_width = i if i <= 19 else 19
-                field = []
-                for j in range(field_width+1):
-                    field.append(frame[i - j])
-                lmax = np.amax(field)
-                lidx = field.index(lmax)
-                if lmax >= -25: notes.append([i - lidx, 'max'])
-                '''
-                x = frame[i]
-                dx = x - prev_x
-                ddx = dx - prev_dx
-                if abs(dx) < 2:
-                    if ddx < -5: notes.append([i, 'max'])
-                    if ddx > 5: notes.append([i, 'min'])
-                prev_x = x
-                prev_dx = dx
-                '''
-            frames.append(copy.copy(notes))
-        for i in range(len(frames)):
-            f = frames[i]
-            for n in f:
-                c = [255, 0, 0] if n[1] == 'max' else [0, 255, 0]
-                self.parr.setp(i, n[0], (c[0], c[1], c[2]))
-
-    def heat_overlay(self, nparr):
-        for idx, val in np.ndenumerate(nparr):
-            if val > -10: self.parr.setp(idx[0], idx[1], 0, 0, 255)
-            elif val > -20: self.parr.setp(idx[0], idx[1], 0, 255, 0)
-            elif val > -30: self.parr.setp(idx[0], idx[1], 255, 0, 0)
-            if idx[0] >= 5000: break
-
     def octave_overlay(self, nparr):
         a_notes = [110, 220, 440, 880, 1760, 3520]
         for idx, val in np.ndenumerate(nparr):
@@ -88,16 +50,35 @@ class TestDisplay():
     spike: width in Hz, centered around CoM at which a threshold (50% rn) of bin mass is reached
     '''
 
-    def com_overlay(self, stencil):
+    def bin_val_overlay(self, stencil, val_str, dot=True):
         for i in range(len(stencil)):
             s = stencil[i]
-            for n in s: 
-                amp_val = n['amp'] / (self.max - self.min)
-                peak_val = n['peak'] / (self.max - self.min)
-                y = int(round((n['com'] - const.FREQ_INC / 2) / const.FREQ_INC))
-                if amp_val > .3: self.parr.setp(i, y, 255, 0, 0)
-                if peak_val > .7: self.parr.setp(i, y, 0, 255, 0)
-                if n['spike'] < 10: self.parr.setp(i, y, 0, 0, 255)
+            if dot:
+                for bin in s:
+                    y = int(round((bin['com'] - const.FREQ_INC / 2) / const.FREQ_INC, 0))
+                    val = bin[val_str]
+                    self.overlay_pixel(val, i, y)
+            else:
+                for y in range(len(self.parr.arr[0])):
+                    freq = y * const.FREQ_INC + const.FREQ_INC
+                    #eliminate hardcoding! :p
+                    if freq < 55 or freq > 3520: continue
+                    bin  = int(round(calc.note_steps(55, freq), 0))
+                    if bin < 0 or bin >= len(s): continue
+                    val = s[bin][val_str]
+                    self.overlay_pixel(val, i, y)
+
+    def overlay_pixel(self, val, i, y):
+        if val >= .95: self.parr.setp(y, i, (0, 0, 255))
+        elif val >= .875: self.parr.setp(y, i, (0, 255, 255))
+        elif val >= .8: self.parr.setp(y, i, (0, 255, 0))
+        elif val >= .725: self.parr.setp(y, i, (255, 255, 0))
+        else: self.parr.setp(y, i, (255, 0, 0))
+        '''
+        else:
+            cint = int(round(val * 255, 0))
+            self.parr.setp(y, i, (cint, cint, cint))
+        '''
 
     def color_overlay(self, stencil, color_map):
         for i in range(len(stencil)):
