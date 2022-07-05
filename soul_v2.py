@@ -15,8 +15,8 @@ from obj.RadialParElipses import RadialParElipses
 from obj.ColorMap import ColorMap
 
 new_stencil = False
-draw_spec = True
-draw_canvas = False
+draw_spec = False
+draw_canvas = True
 
 #lets clean up this initialization so that we're only using it when we need it
 start_time = util.now()
@@ -70,35 +70,35 @@ if draw_spec:
     parr = PixelArray(x, y)
     td = TestDisplay(parr, np.amin(profile), np.amax(profile))
     print("Starting visual spec generation at: " + txt.time_str(util.now()))
-    td.draw_array(profile)
-    td.bin_val_overlay(stencil.stencil, "peak")
+    #td.draw_array(profile)
+    #td.bin_val_overlay(stencil.stencil, "peak")
     #td.heat_overlay(profile)
     #td.peak_overlay(profile)
     #td.octave_overlay(profile)
     #td.note_overlay(profile)
     #td.com_overlay(stencil.stencil)
-    #td.color_overlay(stencil.stencil, color_map_full.map)
+    td.color_overlay(stencil.stencil, color_map_full.map)
     print("Spec generated at: " + txt.time_str(util.now()) + ", now drawing ...")
     parr.show()
 
 if draw_canvas:
     parr = PixelArray(1000 * const.GOLDEN, 1000)
-    x0 = 500
-    y0 = 800
+    x0 = 550
+    y0 = 750
     r0 = 30
-    r1 = 1300
+    r1 = 900
     k_shift = 30
     #color_path_0
-    itheta0 = 12 / 12 * math.pi
+    itheta0 = 11 / 12 * math.pi
     curve0 = 3 / 12 * math.pi
-    width0 = 15 / 12 * math.pi
+    width0 = 16 / 12 * math.pi
     #color_path_1
-    itheta1 = 20 / 12 * math.pi
+    itheta1 = 18 / 12 * math.pi
     curve1 = 2 / 12 * math.pi
-    width1 = 3 / 12 * math.pi
+    width1 = 6 / 12 * math.pi
     #render resolution parameters: frames, dr, lp
     #TODO print these!
-    res_par = None, 60, 30
+    res_par = None, 40, 9
 
     print("Starting canvas generation at: " + txt.time_str(util.now()))
     rpe0 = RadialParElipses(x0, y0, r0, r1, itheta0, curve0, width0, k_shift)

@@ -28,7 +28,4 @@ class PixelArray():
         img.save(img_str)
 
     def setp(self, x, y, rgu):
-        try:
-            self.arr[x][-1 * y] = rgu
-        except:
-            return
+        if x > 0 and y > 0 and x < self.x and y < self.y: self.arr[x][-1 * y] = rgu   

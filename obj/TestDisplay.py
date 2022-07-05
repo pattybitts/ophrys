@@ -87,9 +87,12 @@ class TestDisplay():
                 rgu = color_map[j]
                 if not rgu: continue
                 bin = frame[j]
-                if bin['peak'] < .75: continue
-                #we might just center these on bins eventually #and now eventually is now
+                if bin['peak'] < .675: continue
+                sat_val = (bin['peak'] - .8) / .125
+                if sat_val > 1: sat_val = 1
+                #sharp_val = (bin['spike'] - .3) / .2
+                #if sharp_val > 1: sharp_val = 1
+                rgu = pix.adjust_brightness(color_map[j], sat_val)                
                 y = int(round((bin['freq'] - const.FREQ_INC / 2) / const.FREQ_INC))
-                rgu = pix.saturate(rgu, bin['peak'])
                 self.parr.setp(y, i, rgu)
                 self.parr.setp(y+1, i, rgu)
