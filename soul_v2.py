@@ -47,10 +47,12 @@ layer_0 = {
     'end': 38,
     'path': [
         [0, 0x04, 0x2c, 0x86],   #4, 44, 134
-        [3.66, 0x55, 0x64, 0xaa], #85, 100, 170
-        [7.33, 0x91, 0x92, 0xbf], #145, 146, 191
-        [11, 0x50, 0x50, 0xd4] #80, 80, 212
+        [3.66, 0x20, 0x50, 0xc0], 
+        #[3.66, 0x55, 0x64, 0xaa], #85, 100, 170
+        #[7.33, 0x91, 0x92, 0xbf], #145, 146, 191
+        [7.33, 0x50, 0x50, 0xd4], #80, 80, 212
         #[11, 0x7c, 0xcc, 0xf4] #124, 204, 244
+        [11, 0x70, 0x80, 0xff]
     ]
 }
 layer_1 = {
@@ -77,7 +79,7 @@ if draw_spec:
     #td.octave_overlay(profile)
     #td.note_overlay(profile)
     #td.com_overlay(stencil.stencil)
-    td.color_overlay(stencil.stencil, color_map_full.map)
+    td.color_overlay(stencil.stencil, color_map_full.map, spec_aligned=False)
     print("Spec generated at: " + txt.time_str(util.now()) + ", now drawing ...")
     parr.show()
 
@@ -98,7 +100,7 @@ if draw_canvas:
     width1 = 6 / 12 * math.pi
     #render resolution parameters: frames, dr, lp
     #TODO print these!
-    res_par = None, 40, 9
+    res_par = None, 20, 9
 
     print("Starting canvas generation at: " + txt.time_str(util.now()))
     rpe0 = RadialParElipses(x0, y0, r0, r1, itheta0, curve0, width0, k_shift)

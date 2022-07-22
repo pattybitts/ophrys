@@ -80,19 +80,20 @@ class TestDisplay():
             self.parr.setp(y, i, (cint, cint, cint))
         '''
 
-    def color_overlay(self, stencil, color_map):
+    def color_overlay(self, stencil, color_map, spec_aligned=True):
         for i in range(len(stencil)):
             frame = stencil[i]
-            for j in range(len(frame)):
+            for j in range(12, len(frame)):
                 rgu = color_map[j]
                 if not rgu: continue
                 bin = frame[j]
                 if bin['peak'] < .675: continue
-                sat_val = (bin['peak'] - .8) / .125
-                if sat_val > 1: sat_val = 1
-                #sharp_val = (bin['spike'] - .3) / .2
-                #if sharp_val > 1: sharp_val = 1
-                rgu = pix.adjust_brightness(color_map[j], sat_val)                
-                y = int(round((bin['freq'] - const.FREQ_INC / 2) / const.FREQ_INC))
+                sat_val = calc.rescale(bin['peak'], .5, .75, 1.1)
+                #satsign = 1 if sat_val > 0 else -1
+                #sat_val = satsign * math.sqrt(abs(sat_val))
+                #sharp_val here too?
+                rgu = pix.adjust_saturation(color_map[j], sat_val)
+                if spec_aligned: y = int(round((bin['freq'] - const.FREQ_INC / 2) / const.FREQ_INC))
+                else: y = j * 12
                 self.parr.setp(y, i, rgu)
                 self.parr.setp(y+1, i, rgu)

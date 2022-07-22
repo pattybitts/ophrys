@@ -108,7 +108,7 @@ class RadialParElipses():
                 rpe = mr[1]
                 x, y = rpe.par_xy(t)
                 bins = stencil[i]
-                for j in range(len(bins)):
+                for j in range(12, len(bins)):
                     b = bins[j]
                     #we could use another module to create consistent filtering between test and elipse
                     #(it's unlikely i'll actually do that)
@@ -116,11 +116,9 @@ class RadialParElipses():
                     if color_map[j] is None: continue
                     p_score = b['peak']
                     #there's definitely a more organic way to set an upper limit here
-                    sat_val = (b['peak'] - .8) / .125
-                    if sat_val > 1: sat_val = 1                    
-                    sharp_val = (b['spike'] - .3) / .2
-                    if sharp_val > 1: sharp_val = 1
-                    rgu = pix.adjust_brightness(color_map[j], sat_val)
+                    sat_val = calc.rescale(b['peak'], .5, .75, 1.1)
+                    sharp_val = calc.rescale(b['spike'], .3, .375, .45)                 
+                    rgu = pix.adjust_saturation(color_map[j], sat_val)
                     theta = rpe.note_theta(cm_min, cm_max, j)
                     xt, yt = rpe.theta_offset(x, y, theta)
                     if speckles:
