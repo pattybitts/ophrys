@@ -15,7 +15,7 @@ class PixelArray():
         self.arr = [[(0, 0, 0) for i in range(self.y)] for j in range(self.x)]
 
     #TODO separate show and save
-    def show(self):
+    def show(self, res_mod=100):
         img = Image.new(mode="RGB", size=(self.x, self.y))
         #this is a much faster parse than np.nedumerate?
         for x in range(self.x):
@@ -25,7 +25,8 @@ class PixelArray():
                 img.putpixel(xy, rgu)
         img.show()
         img_str = const.IMG_SAVE + txt.date_file_str(util.now()) + ".png"
-        img.save(img_str)
+        res_dpi = (self.x * res_mod, self.y * res_mod)
+        img.save(img_str, format='png', dpi=res_dpi)
 
     def setp(self, x, y, rgu):
         if x > 0 and y > 0 and x < self.x and y < self.y: self.arr[x][-1 * y] = rgu   

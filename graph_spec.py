@@ -5,12 +5,13 @@ import util.txt as txt
 import util.util as util
 
 in_str = "epiphany"
-profile_type = "spec" #chroma, spec, melspec
+profile_type = "chroma" #chroma, spec, melspec
+inc = 10 #time increment in seconds
 
 input_file = const.IN_PATH + in_str + ".wav"
 output_dest = const.OUT_PATH
 
-trans = Transcriber(input_file, output_dest, 2.5)
+trans = Transcriber(input_file, output_dest, inc)
 if profile_type == "chroma": trans.transcribe_chromagram()
 if profile_type == "spec": trans.transcribe_stft()
 if profile_type == "melspec": trans.transcribe_spectogram()

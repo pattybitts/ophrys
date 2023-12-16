@@ -22,6 +22,7 @@ class TestDisplay():
         for idx, val in np.ndenumerate(nparr):
             val  = int(abs(val * rgumod))
             self.parr.setp(idx[0], idx[1], (val, val, val))
+            #this should find a way to move into a script parameter
             if idx[0] >= 5000: break
 
     def octave_overlay(self, nparr):
@@ -97,3 +98,16 @@ class TestDisplay():
                 else: y = j * 12
                 self.parr.setp(y, i, rgu)
                 self.parr.setp(y+1, i, rgu)
+
+    def sheet_music_overlay(self, stencil, color_map):
+        for i in range(len(stencil)):
+            frame = stencil[i]
+            for j in range(0, len(frame)):
+                rgu =  color_map[j]
+                if not rgu: continue
+                bin = frame[j]
+                if bin['peak'] < .65: continue
+                y = j * 12
+                line_thickness = int(round(calc.rescale(bin['peak'], .65, .85, 1.05, 0, 6), 0))
+                for k in range(line_thickness):
+                    self.parr.setp(y+k, i, rgu)

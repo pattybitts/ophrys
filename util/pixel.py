@@ -14,14 +14,14 @@ def min(rgu):
 def adjust_brightness(rgu, m):
     new_rgu = []
     for c in rgu:
-        mod = c if m < 0 else 255 - c
+        mod = c if m <= 0 else 255 - c
         new_rgu.append(mod * m + c)
     return intify((new_rgu[0], new_rgu[1], new_rgu[2]))
 
 def adjust_saturation(rgu, m):
     new_rgu = []
     for c in rgu:
-        mod = c if m < 0 else 255 / c
+        mod = c if m <= 0 else 255 / c
         new_rgu.append(c * mod ** m)
     return intify((new_rgu[0], new_rgu[1], new_rgu[2]))
 

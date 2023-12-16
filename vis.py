@@ -15,8 +15,8 @@ from obj.RadialParElipses import RadialParElipses
 from obj.ColorMap import ColorMap
 
 new_stencil = False
-draw_spec = False
-draw_canvas = True
+draw_spec = True
+draw_canvas = False
 
 #lets clean up this initialization so that we're only using it when we need it
 start_time = util.now()
@@ -24,7 +24,8 @@ print("Intializing at: " + txt.time_str(util.now()))
 if new_stencil or draw_spec:
     print("Loading profile at: " + txt.time_str(util.now()))
     #profile = ds.load_pickle("output\profile_spec_test_a4_a5_22_05_26_2013_55")
-    profile = ds.load_pickle("output\profile_spec_epiphany_22_05_26_2051_53")
+    #profile = ds.load_pickle("output\profile_spec_epiphany_22_05_26_2051_53")
+    profile = ds.load_pickle("output\profile_chroma_epiphany_22_07_23_1133_22")
     if not ret.success(profile):
         print("Invalid profile")
         quit()
@@ -42,6 +43,21 @@ if not ret.success(stencil):
     quit()
 print("Stencil Frames: " + str(len(stencil.stencil)))
 
+layer_0 = {
+    'start': 0,
+    'end': 59,
+    'path': [
+        [0, 0xff, 0x00, 0x00],
+        [2, 0xff, 0xff, 0x00],
+        [4, 0x00, 0xff, 0x00],
+        [6, 0x00, 0xff, 0xff],
+        [8, 0x00, 0x00, 0xff],
+        [10, 0xff, 0x00, 0xff]
+    ]
+}
+color_map_full = ColorMap([layer_0])
+
+'''
 layer_0 = {
     'start': 3,
     'end': 38,
@@ -66,20 +82,22 @@ layer_1 = {
 color_map_full = ColorMap([layer_0, layer_1])
 color_map_0 = ColorMap([layer_0])
 color_map_1 = ColorMap([layer_1])
+'''
 
 if draw_spec:
     x, y  = profile.shape
-    parr = PixelArray(x, y)
+    parr = PixelArray(x, 100)
     td = TestDisplay(parr, np.amin(profile), np.amax(profile))
     print("Starting visual spec generation at: " + txt.time_str(util.now()))
-    #td.draw_array(profile)
+    td.draw_array(profile)
     #td.bin_val_overlay(stencil.stencil, "peak")
     #td.heat_overlay(profile)
     #td.peak_overlay(profile)
     #td.octave_overlay(profile)
     #td.note_overlay(profile)
     #td.com_overlay(stencil.stencil)
-    td.color_overlay(stencil.stencil, color_map_full.map, spec_aligned=False)
+    #td.color_overlay(stencil.stencil, color_map_full.map, spec_aligned=False)
+    #td.sheet_music_overlay(stencil.stencil, color_map_full.map)
     print("Spec generated at: " + txt.time_str(util.now()) + ", now drawing ...")
     parr.show()
 
