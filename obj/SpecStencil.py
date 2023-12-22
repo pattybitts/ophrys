@@ -45,9 +45,9 @@ class SpecStencil:
                     peak = 0
                 else:
                     com = SpecStencil.bin_com(note, 20)
-                    amp  = SpecStencil.bin_mass(note, 10)
+                    amp = SpecStencil.bin_mass(note, 10)
                     spike = SpecStencil.spike_score(note, com)
-                    peak  = SpecStencil.bin_peak(note)
+                    peak = SpecStencil.bin_peak(note)
                 freqs.append(n); amps.append(amp); spikes.append(spike); peaks.append(peak); coms.append(com)
             for x in [('freq', freqs), ('amp', amps), ('spike', spikes), ('peak', peaks), ('com', coms)]:
                 stencil[x[0]].append(copy.copy(x[1]))

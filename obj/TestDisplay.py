@@ -31,7 +31,7 @@ class TestDisplay():
             hz = calc.freq(idx[1])
             for a in a_notes:
                 if a - hz > -2.7 and a - hz < 0:
-                    self.parr.setp(idx[0], idx[1], 255, 255, 0)
+                    self.parr.setp(idx[1], idx[0], (255, 255, 0))
                     break
 
     def note_overlay(self, nparr):
@@ -40,7 +40,7 @@ class TestDisplay():
             hz = calc.freq(idx[1])
             for n in note_bins:
                 if n - hz > -1.35 and n - hz < 1.35:
-                    self.parr.setp(idx[0], idx[1], 0, 255, 255)
+                    self.parr.setp(idx[1], idx[0], (0, 255, 255))
                     break
 
     '''
