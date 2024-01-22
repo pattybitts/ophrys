@@ -17,6 +17,7 @@ from obj.ColorMap import ColorMap
 new_stencil = False
 draw_spec = True
 draw_canvas = False
+test_colors = True
 
 #lets clean up this initialization so that we're only using it when we need it
 start_time = util.now()
@@ -43,46 +44,47 @@ if not ret.success(stencil):
     quit()
 print("Stencil Frames: " + str(len(stencil.stencil)))
 
-layer_0 = {
-    'start': 0,
-    'end': 59,
-    'path': [
-        [0, 0xff, 0x00, 0x00],
-        [2, 0xff, 0xff, 0x00],
-        [4, 0x00, 0xff, 0x00],
-        [6, 0x00, 0xff, 0xff],
-        [8, 0x00, 0x00, 0xff],
-        [10, 0xff, 0x00, 0xff]
-    ]
-}
-color_map_full = ColorMap([layer_0])
-
-'''
-layer_0 = {
-    'start': 3,
-    'end': 38,
-    'path': [
-        [0, 0x04, 0x2c, 0x86],   #4, 44, 134
-        [3.66, 0x20, 0x50, 0xc0], 
-        #[3.66, 0x55, 0x64, 0xaa], #85, 100, 170
-        #[7.33, 0x91, 0x92, 0xbf], #145, 146, 191
-        [7.33, 0x50, 0x50, 0xd4], #80, 80, 212
-        #[11, 0x7c, 0xcc, 0xf4] #124, 204, 244
-        [11, 0x70, 0x80, 0xff]
-    ]
-}
-layer_1 = {
-    'start': 39,
-    'end': 62,
-    'path': [
-        [0, 0xf9, 0xa0, 0x06], #249, 160, 6
-        [11, 0xee, 0xe4, 0x34] #238, 228, 52
-    ]
-}
-color_map_full = ColorMap([layer_0, layer_1])
-color_map_0 = ColorMap([layer_0])
-color_map_1 = ColorMap([layer_1])
-'''
+if test_colors:
+    layer_0 = {
+        'start': 0,
+        'end': 59,
+        'path': [
+            [0, 0xff, 0x00, 0x00],
+            [2, 0xff, 0xff, 0x00],
+            [4, 0x00, 0xff, 0x00],
+            [6, 0x00, 0xff, 0xff],
+            [8, 0x00, 0x00, 0xff],
+            [10, 0xff, 0x00, 0xff]
+        ]
+    }
+    color_map_full = ColorMap([layer_0])
+    color_map_0 = ColorMap([layer_0])
+    color_map_1 = ColorMap([layer_0])
+else:
+    layer_0 = {
+        'start': 3,
+        'end': 38,
+        'path': [
+            [0, 0x04, 0x2c, 0x86],   #4, 44, 134
+            [3.66, 0x20, 0x50, 0xc0], 
+            #[3.66, 0x55, 0x64, 0xaa], #85, 100, 170
+            #[7.33, 0x91, 0x92, 0xbf], #145, 146, 191
+            [7.33, 0x50, 0x50, 0xd4], #80, 80, 212
+            #[11, 0x7c, 0xcc, 0xf4] #124, 204, 244
+            [11, 0x70, 0x80, 0xff]
+        ]
+    }
+    layer_1 = {
+        'start': 39,
+        'end': 62,
+        'path': [
+            [0, 0xf9, 0xa0, 0x06], #249, 160, 6
+            [11, 0xee, 0xe4, 0x34] #238, 228, 52
+        ]
+    }
+    color_map_full = ColorMap([layer_0, layer_1])
+    color_map_0 = ColorMap([layer_0])
+    color_map_1 = ColorMap([layer_1])
 
 if draw_spec:
     x, y  = profile.shape
@@ -128,7 +130,7 @@ if draw_canvas:
     #parr = rpe1.draw_guidelines(parr)
     print("Canvas generated at: " + txt.time_str(util.now()) + ", now drawing ...")
     parr.show()
-
-print("Canvas rendered at: " + txt.time_str(util.now()))
+    print("Canvas rendered at: " + txt.time_str(util.now()))
+    
 render_time = util.now() - start_time
 print("Total render time: " + txt.delta_str(render_time))

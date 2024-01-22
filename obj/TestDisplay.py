@@ -44,6 +44,19 @@ class TestDisplay():
                     break
 
     '''
+    NoteStencil properties:
+    stencil: simple list of notes as detected
+    in this version each note is simply a note edge detected
+    note properties:
+    x: x coordinate, frequency bin
+    y: y coordinate, ascending frames (by time)
+    '''
+
+    def note_stencil_overlay(self, stencil):
+        for note in stencil:
+            self.parr.setp(note['x'], note['y'], (255, 0, 0))
+
+    '''
     stencil data:
     amp: sum of bin amplitudes above a cutoff threshold (20 rn) averaged over valid points
     com: center of mass in Hz of note
