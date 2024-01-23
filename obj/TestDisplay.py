@@ -53,8 +53,15 @@ class TestDisplay():
     '''
 
     def note_stencil_overlay(self, stencil):
-        for note in stencil:
-            self.parr.setp(note['x'], note['y'], (255, 0, 0))
+        for s in stencil:
+            for x in range(s['xmin'], s['xmax']):
+                self.parr.setp(x, s['ymin'], (0, 0, 255))
+                self.parr.setp(x, s['ymax'], (0, 0, 255))
+            for y in range(s['ymin'], s['ymax']):
+                self.parr.setp(s['xmin'], y, (0, 0, 255))
+                self.parr.setp(s['xmax'], y, (0, 0, 255))
+        for s in stencil:
+            self.parr.setp(s['lead_x'], s['lead_y'], (0, 255, 0))
 
     '''
     stencil data:

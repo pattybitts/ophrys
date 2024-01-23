@@ -11,7 +11,7 @@ from obj.PixelArray import PixelArray
 from obj.TestDisplay import TestDisplay
 
 #specify run parameters
-new_stencil = False
+new_stencil = True
 draw_spec = True
 
 profile_path = "output\profile_spec_epiphany_22_05_26_2051_53"
@@ -20,7 +20,7 @@ profile_path = "output\profile_spec_epiphany_22_05_26_2051_53"
 stencil_path = "{p}spec_note_stencil_soul".format(p=const.OUT_PATH)
 
 custom_profile_w = 800 #cuts off high end frequency bins
-custom_spec_x = 0
+custom_spec_x = 0 #resizes profile input (for testing)
 custom_spec_y = 400
 
 #initialization, loading profile if we need one
@@ -37,7 +37,7 @@ if new_stencil or draw_spec:
 #loading/generating stencil
 if new_stencil:
     print("Starting stencil generation at: " + txt.time_str(util.now()))
-    stencil = NoteStencil(profile)
+    stencil = NoteStencil(profile, custom_spec_x, custom_spec_y)
     ds.dump_pickle(stencil, stencil_path)
 else:
     stencil = ds.load_pickle(stencil_path)
@@ -58,9 +58,9 @@ if draw_spec:
     print("Starting visual spec generation at: " + txt.time_str(util.now()))
     #TestDisplay functions draw profiles and overlay filters in order listed
     td.draw_array(profile)
-    #td.note_overlay(profile)
-    #td.octave_overlay(profile)
-    #td.note_stencil_overlay(stencil.stencil)
+    td.note_overlay(profile)
+    td.octave_overlay(profile)
+    td.note_stencil_overlay(stencil.stencil)
     print("Spec generated at: " + txt.time_str(util.now()) + ", now drawing ...")
     parr.show()
 
