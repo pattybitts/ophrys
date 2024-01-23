@@ -58,8 +58,8 @@ if draw_spec:
     print("Starting visual spec generation at: " + txt.time_str(util.now()))
     #TestDisplay functions draw profiles and overlay filters in order listed
     td.draw_array(profile)
-    td.note_overlay(profile)
-    td.octave_overlay(profile)
+    #td.note_overlay(profile)
+    #td.octave_overlay(profile)
     td.note_stencil_overlay(stencil.stencil)
     print("Spec generated at: " + txt.time_str(util.now()) + ", now drawing ...")
     parr.show()

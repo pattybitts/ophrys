@@ -48,20 +48,19 @@ class TestDisplay():
     stencil: simple list of notes as detected
     in this version each note is simply a note edge detected
     note properties:
-    x: x coordinate, frequency bin
-    y: y coordinate, ascending frames (by time)
+    x0, x1: x coordinate, frequency bin
+    y0, y1: y coordinate, ascending frames (by time)
+    such that values define the rectangular shape of a defined note
     '''
 
     def note_stencil_overlay(self, stencil):
         for s in stencil:
-            for x in range(s['xmin'], s['xmax']):
-                self.parr.setp(x, s['ymin'], (0, 0, 255))
-                self.parr.setp(x, s['ymax'], (0, 0, 255))
-            for y in range(s['ymin'], s['ymax']):
-                self.parr.setp(s['xmin'], y, (0, 0, 255))
-                self.parr.setp(s['xmax'], y, (0, 0, 255))
-        for s in stencil:
-            self.parr.setp(s['lead_x'], s['lead_y'], (0, 255, 0))
+            for x in range(s['x0'], s['x1']):
+                self.parr.setp(x, s['y0'], (0, 0, 255))
+                self.parr.setp(x, s['y1'], (0, 0, 255))
+            for y in range(s['y0'], s['y1']):
+                self.parr.setp(s['x0'], y, (0, 0, 255))
+                self.parr.setp(s['x1'], y, (0, 0, 255))
 
     '''
     stencil data:
