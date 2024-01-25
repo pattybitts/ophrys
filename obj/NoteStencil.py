@@ -15,7 +15,8 @@ class NoteStencil:
         
     #second draft of note generation
     #might need to draw a diagram to explain these parsing variables
-    def generate_note_profile(self, custom_spec_x, custom_spec_y, dx=3, dy=2, x_slope=11, y_slope=-5, wmax=20, hmax=1000):
+    #TODO implement actual filtering functions
+    def generate_note_profile(self, custom_spec_x, custom_spec_y, dx=3, dy=2, x_slope=11, y_slope=-5, wmax=20, pmin=1):
         pro = self.profile
         xmax = custom_spec_x if custom_spec_x else pro.shape[0] - (1 + 2 * dx)
         ymax = custom_spec_y if custom_spec_y else pro.shape[1] - 1
@@ -36,6 +37,7 @@ class NoteStencil:
                 in_note = False
                 for n in reversed(notes_1):
                     if y >= n['y0'] and y <= n['y1'] and x <= n['x1'] and x >= n['x0']:
+                        n['points'] += 1
                         in_note = True
                         break
                 if in_note: continue
@@ -61,8 +63,30 @@ class NoteStencil:
                     my = (avg_y1 - avg_y0) / (x1 - x) / dy
                     if my <= y_slope: y0 = yp - dy; break
                 #creating note item
-                notes_1.append({'x0': x, 'x1': x1, 'y0': y0, 'y1': y})
-        return notes_1
+                notes_1.append({'x0': x, 'x1': x1, 'y0': y0, 'y1': y, 'points': 1})
+        #second filter, combining overlapping notes
+        notes_2 = []
+        for n in notes_1:
+            overlap = False
+            for n2 in notes_2:
+                #logic translates to: if both x boundaries are outside or both y boundaries are outside
+                x00 = n['x0'] < n2['x0']; x01 = n['x0'] > n2['x1']
+                x10 = n['x1'] < n2['x0']; x11 = n['x1'] > n2['x1']
+                y00 = n['y0'] < n2['y0']; y01 = n['y0'] > n2['y1']
+                y10 = n['y1'] < n2['y0']; y11 = n['y1'] > n2['y1']
+                if (x00+x01)*(x10+x11)+(y00+y01)*(y10+y11): continue
+                overlap = True
+                if x00: n2['x0'] = n['x0']
+                if x11: n2['x1'] = n['x1']
+                if y00: n2['y0'] = n['y0']
+                if y11: n2['y1'] = n['y1']
+                n2['points'] += n['points']
+            if not overlap: notes_2.append(n)
+        #third filter, cutting notes with few points
+        notes_3 = []
+        for n2 in notes_2:
+            if n2['points'] >= pmin: notes_3.append(n2)
+        return notes_3
 
     #note this scanner is 6 pixels wide, hence the range modifications
     def generate_note_profile_dep(self, custom_spec_x, custom_spec_y):
