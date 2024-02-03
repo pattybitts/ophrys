@@ -69,12 +69,12 @@ class NoteStencil:
         for n in notes_1:
             overlap = False
             for n2 in notes_2:
-                #logic translates to: if both x boundaries are outside or both y boundaries are outside
+                #new logic! way way simpler if any n minimum is outside the n2 maximum
                 x00 = n['x0'] < n2['x0']; x01 = n['x0'] > n2['x1']
                 x10 = n['x1'] < n2['x0']; x11 = n['x1'] > n2['x1']
                 y00 = n['y0'] < n2['y0']; y01 = n['y0'] > n2['y1']
                 y10 = n['y1'] < n2['y0']; y11 = n['y1'] > n2['y1']
-                if (x00+x01)*(x10+x11)+(y00+y01)*(y10+y11): continue
+                if x01+x10+y01+y10: continue
                 overlap = True
                 if x00: n2['x0'] = n['x0']
                 if x11: n2['x1'] = n['x1']
