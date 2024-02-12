@@ -5,7 +5,7 @@ import util.txt as txt
 import util.util as util
 
 in_str = "epiphany"
-profile_type = "chroma" #chroma, spec, melspec
+profile_type = "spec" #chroma, spec, melspec
 inc = 10 #time increment in seconds
 
 input_file = const.IN_PATH + in_str + ".wav"

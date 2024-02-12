@@ -28,6 +28,7 @@ U_RANGE = [0, 1]
 
 #Spectrogram interpretation
 FREQ_INC = 22050 / 8192
+TIME_INC = .09256
 
 #time values, formatting
 TZ = pytz.UTC

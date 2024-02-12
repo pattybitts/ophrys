@@ -11,7 +11,7 @@ from obj.PixelArray import PixelArray
 from obj.TestDisplay import TestDisplay
 
 #specify run parameters
-new_stencil = True
+new_stencil = False
 draw_spec = True
 
 profile_path = "output\profile_spec_epiphany_22_05_26_2051_53"
@@ -32,6 +32,7 @@ if new_stencil or draw_spec:
     if not ret.success(profile):
         print("Invalid profile" + profile_path)
         quit()
+    print("Profile Dimensions: " + str(np.shape(profile))) 
     if custom_profile_w: profile = profile[0:custom_profile_w,:]
 
 #loading/generating stencil
@@ -60,7 +61,7 @@ if draw_spec:
     td.draw_array(profile)
     #td.note_overlay(profile)
     #td.octave_overlay(profile)
-    td.note_stencil_overlay(stencil.stencil)
+    #td.note_stencil_overlay(stencil.stencil)
     print("Spec generated at: " + txt.time_str(util.now()) + ", now drawing ...")
     parr.show()
 

@@ -7,6 +7,7 @@ class NoteStencil:
     def __init__(self, profile, custom_spec_x, custom_spec_y):
         self.profile = profile
         self.stencil = self.generate_note_profile(custom_spec_x, custom_spec_y)
+        self.stencil = self.define_note_properties()
 
     #profile axes come in as nested lists [x_values[y_values]]
     #that is, a list of bins containing lists of frames
@@ -22,10 +23,10 @@ class NoteStencil:
         ymax = custom_spec_y if custom_spec_y else pro.shape[1] - 1
         ymin = 2 * dy - 1
         #first filter, using 3 slope scans to find ts
-        #scanning top down so that duplicate notes are quickly skipped
+        #scanning y top down so that duplicate notes are quickly skipped
         notes_1 = []
         for y in range(ymax, ymin, -1):
-            #scanning for rising slope
+            #scanning x for rising slope
             for x in range(0, xmax):
                 avg_x0 = 0; avg_x1 = 0
                 for i in range(0, dx):
@@ -41,7 +42,7 @@ class NoteStencil:
                         in_note = True
                         break
                 if in_note: continue
-                #scanning for falling slope
+                #scanning x for falling slope
                 x1 = None
                 xcap = xmax if xmax < x+wmax else x+wmax
                 for xp in range(x, xcap):
@@ -52,7 +53,7 @@ class NoteStencil:
                     mx = (avg_x1 - avg_x0) / dx
                     if mx <= x_slope * -1: x1 = xp + dx * 2; break
                 if not x1: continue
-                #scanning down for t edge
+                #scanning down y for t edge
                 y0 = ymin
                 for yp in range(y, ymin, -1):
                     avg_y0 = 0; avg_y1 = 0
@@ -87,6 +88,25 @@ class NoteStencil:
         for n2 in notes_2:
             if n2['points'] >= pmin: notes_3.append(n2)
         return notes_3
+    
+    #at this time, 5 note properties are
+    #origin: y0 coordinate; unit: frame
+    #pitch: xcom coordinate; unit: hz
+    #volume: sum amplitudes; unit: decibel
+    #clarity: minimum width from xcom containing x% volume; unit: d-hz
+    #stretch: mimimum height from y0 containing y% volume; unit: d-frame
+    def define_note_properties(self):
+        pro = self.profile
+        amin = np.amin(pro)
+        notes_1 = []
+        for n in self.stencil:
+            xsums = []
+            for x in range(n['x0'], n['x1']+1):
+                xsum = 0
+                for y in range(n['y0'], n['y1']+1):
+                    xsum += pro[x, y] - amin
+                xsums.append(xsum)
+            
 
     #note this scanner is 6 pixels wide, hence the range modifications
     def generate_note_profile_dep(self, custom_spec_x, custom_spec_y):
