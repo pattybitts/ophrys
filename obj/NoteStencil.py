@@ -1,6 +1,10 @@
 import numpy as np
+import math as math
 
 from statistics import mean
+
+import util.calc as calc
+import util.const as const
 
 class NoteStencil:
 
@@ -87,26 +91,56 @@ class NoteStencil:
         notes_3 = []
         for n2 in notes_2:
             if n2['points'] >= pmin: notes_3.append(n2)
+        #sort bottom up left to right
+        notes_3.sort(key=lambda n: n['x0'])
+        notes_3.sort(key=lambda n: n['y0'])
         return notes_3
     
     #at this time, 5 note properties are
     #origin: y0 coordinate; unit: frame
     #pitch: xcom coordinate; unit: hz
     #volume: sum amplitudes; unit: decibel
-    #clarity: minimum width from xcom containing x% volume; unit: d-hz
-    #stretch: mimimum height from y0 containing y% volume; unit: d-frame
-    def define_note_properties(self):
+    #breadth: minimum width from xcom containing x% volume; unit: d-hz
+    #stretch: distance between y0 and yCoM; unit: d-frame
+    def define_note_properties(self, xpct=.5, ypct=.5, dx=.2, dy=.2):
         pro = self.profile
         amin = np.amin(pro)
-        notes_1 = []
         for n in self.stencil:
+            #creating array of xcolumn sums for total volume, com, breadth
             xsums = []
             for x in range(n['x0'], n['x1']+1):
                 xsum = 0
                 for y in range(n['y0'], n['y1']+1):
                     xsum += pro[x, y] - amin
                 xsums.append(xsum)
-            
+            xcom = calc.array_com(xsums)
+            volume = np.sum(xsums)
+            #calculating breadth by exoanding xvol by dx, using xsums
+            xvol = xsums[round(xcom)] * dx
+            xinc = 0; xwidth = 0
+            while(xvol < volume * xpct):
+                xinc += 1
+                if round(xcom + xinc * dx) < len(xsums):
+                    xwidth += 1
+                    xvol += xsums[round(xcom + xinc * dx)] * dx
+                if round(xcom - xinc * dx) >= 0:
+                    xwidth += 1
+                    xvol += xsums[round(xcom - xinc * dx)] * dx
+            breadth = dx * (1 + xwidth) * const.FREQ_INC
+            #creating array of yrow sums for yCoM -> stretch
+            ysums = []
+            for y in range(n['y0'], n['y1']+1):
+                ysum = 0
+                for x in range(n['x0'], n['x1']+1):
+                    ysum += pro[x, y] - amin
+                ysums.append(ysum)
+            ycom = calc.array_com(ysums)
+            n['origin'] = n['y0']
+            n['volume'] = volume
+            n['pitch'] = (xcom + n['x0'] + .5) * const.FREQ_INC
+            n['breadth'] = breadth
+            n['stretch'] = ycom
+        return self.stencil
 
     #note this scanner is 6 pixels wide, hence the range modifications
     def generate_note_profile_dep(self, custom_spec_x, custom_spec_y):

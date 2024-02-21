@@ -11,7 +11,7 @@ from obj.PixelArray import PixelArray
 from obj.TestDisplay import TestDisplay
 
 #specify run parameters
-new_stencil = False
+new_stencil = True
 draw_spec = True
 
 profile_path = "output\profile_spec_epiphany_22_05_26_2051_53"
@@ -61,7 +61,7 @@ if draw_spec:
     td.draw_array(profile)
     #td.note_overlay(profile)
     #td.octave_overlay(profile)
-    #td.note_stencil_overlay(stencil.stencil)
+    td.note_stencil_overlay(stencil.stencil)
     print("Spec generated at: " + txt.time_str(util.now()) + ", now drawing ...")
     parr.show()
 

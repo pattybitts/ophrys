@@ -5,6 +5,18 @@ import util.const as const
 def distance(x0, y0, x1, y1):
     return math.sqrt((x1-x0)**2+(y1-y0)**2)
 
+#this isn't universal, so I have to define premises
+#(that is, give literally just an API function definition)
+#given an array of values, calculates a CoM assuming each value is centered at the array index
+def array_com(arr):
+    num = 0
+    den = 0
+    for i in range(0, len(arr)):
+        num += i * arr[i]
+        den += arr[i]
+    if not den: return (len(arr) - 1)/2
+    return num/den
+
 def freq(n):
     unit = const.FREQ_INC
     return n * unit + unit / 2
