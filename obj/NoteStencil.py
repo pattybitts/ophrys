@@ -102,7 +102,7 @@ class NoteStencil:
     #volume: sum amplitudes; unit: decibel
     #breadth: minimum width from xcom containing x% volume; unit: d-hz
     #stretch: distance between y0 and yCoM; unit: d-frame
-    def define_note_properties(self, xpct=.5, ypct=.5, dx=.2, dy=.2):
+    def define_note_properties(self, xpct=.5, dx=.2):
         pro = self.profile
         amin = np.amin(pro)
         for n in self.stencil:
